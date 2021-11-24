@@ -1,9 +1,10 @@
 # tap-googleads
 
+This fork of `tap-googleads` supports the meltano varient of `target-postgres` and will sync ONLY the GoogleAds data under your specified `customer_id`.
+
 `tap-googleads` is a Singer tap for GoogleAds.
 
-THIS IS NOT READY FOR PRODUCTION. Bearer tokens sometimes slip out to logs. Use at your own Peril :D
-
+Bearer tokens sometimes slip out to logs. Use at your own Peril :D
 
 Built with the [Meltano Tap SDK](https://sdk.meltano.com) for Singer Taps.
 
