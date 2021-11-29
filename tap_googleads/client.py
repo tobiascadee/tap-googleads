@@ -124,4 +124,3 @@ class GoogleAdsStream(RESTStream):
             date = parser.parse(self.config.get("end_date"))
             date = "'" + date.strftime("%Y-%m-%d") + "'"
         return date or self._end_date
-

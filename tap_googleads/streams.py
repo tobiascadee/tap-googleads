@@ -13,12 +13,14 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 # TODO: - Override `UsersStream` and `GroupsStream` with your own stream definition.
 #       - Copy-paste as many times as needed to create multiple stream types.
 
+
 class CustomerStream(GoogleAdsStream):
     """Define custom stream."""
+
     @property
     def path(self):
-        return "/customers/"+self.config["customer_id"]
-    
+        return "/customers/" + self.config["customer_id"]
+
     name = "stream_customers"
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "customer.json"
@@ -26,19 +28,21 @@ class CustomerStream(GoogleAdsStream):
 
 class AccessibleCustomers(GoogleAdsStream):
     """Accessible Customers"""
-    path="/customers:listAccessibleCustomers"
+
+    path = "/customers:listAccessibleCustomers"
     name = "stream_accessible_customers"
     primary_keys = None
     replication_key = None
-    #TODO add an assert for one record
-#    schema_filepath = SCHEMAS_DIR / "customer.json"
+    # TODO add an assert for one record
+    #    schema_filepath = SCHEMAS_DIR / "customer.json"
     schema = th.PropertiesList(
-            th.Property("resourceNames", th.ArrayType(th.StringType))
-            ).to_dict()
+        th.Property("resourceNames", th.ArrayType(th.StringType))
+    ).to_dict()
 
     def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
         """Return a context dictionary for child streams."""
-        return { "resourceNames": ["customers/" + self.config.get("customer_id")] }
+        return {"resourceNames": ["customers/" + self.config.get("customer_id")]}
+
 
 class CustomerHierarchyStream(GoogleAdsStream):
     """
@@ -49,18 +53,19 @@ class CustomerHierarchyStream(GoogleAdsStream):
     know when to query the down stream apps.
 
     """
-    
-    #TODO add a seperate stream to get the Customer information and return i
+
+    # TODO add a seperate stream to get the Customer information and return i
     rest_method = "POST"
+
     @property
     def path(self):
-        #Paramas
+        # Paramas
         path = "/customers/{client_id}"
         path = path + "/googleAds:search"
         path = path + "?pageSize=10000"
         path = path + f"&query={self.gaql}"
         return path
-    
+
     @property
     def gaql(self):
         return """
@@ -75,13 +80,16 @@ class CustomerHierarchyStream(GoogleAdsStream):
         FROM customer_client
         WHERE customer_client.level <= 1
 	"""
+
     records_jsonpath = "$.results[*]"
     name = "stream_customer_hierarchy"
     replication_key = None
     parent_stream_type = AccessibleCustomers
-    #schema_filepath = SCHEMAS_DIR / "campaign.json"
+    # schema_filepath = SCHEMAS_DIR / "campaign.json"
     schema = th.PropertiesList(
-            th.Property("customerClient",th.ObjectType(
+        th.Property(
+            "customerClient",
+            th.ObjectType(
                 th.Property("resourceName", th.StringType),
                 th.Property("clientCustomer", th.StringType),
                 th.Property("level", th.StringType),
@@ -90,12 +98,12 @@ class CustomerHierarchyStream(GoogleAdsStream):
                 th.Property("descriptiveName", th.StringType),
                 th.Property("currencyCode", th.StringType),
                 th.Property("id", th.StringType),
-            ))
-            ).to_dict()
-    
+            ),
+        )
+    ).to_dict()
 
-    #Goal of this stream is to send to children stream a dict of
-    #login-customer-id:customer-id to query for all queries downstream
+    # Goal of this stream is to send to children stream a dict of
+    # login-customer-id:customer-id to query for all queries downstream
     def get_records(self, context: Optional[dict]) -> Iterable[Dict[str, Any]]:
         """Return a generator of row-type dictionary objects.
 
@@ -108,24 +116,27 @@ class CustomerHierarchyStream(GoogleAdsStream):
             One item per (possibly processed) record in the API.
         """
 
-        context["client_id"]=self.config.get("customer_id")
+        context["client_id"] = self.config.get("customer_id")
         for row in self.request_records(context):
             row = self.post_process(row, context)
-            #Don't search Manager accounts as we can't query them for everything
-            if (row["customerClient"]["manager"] == True): continue
+            # Don't search Manager accounts as we can't query them for everything
+            if row["customerClient"]["manager"] == True:
+                continue
             yield row
-    
+
     def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
         """Return a context dictionary for child streams."""
-        return { "client_id":self.config.get("customer_id") }
+        return {"client_id": self.config.get("customer_id")}
+
 
 class GeotargetsStream(GoogleAdsStream):
     """Geotargets, worldwide, constant across all customers"""
+
     rest_method = "POST"
-    
+
     @property
     def path(self):
-        #Paramas
+        # Paramas
         path = f"/customers/{self.config.get('customer_id')}"
         path = path + "/googleAds:search"
         path = path + "?pageSize=10000"
@@ -139,18 +150,20 @@ class GeotargetsStream(GoogleAdsStream):
     name = "stream_geo_target_constant"
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "geo_target_constant.json"
-    parent_stream_type = None #Override ReportsStream default as this is a constant
+    parent_stream_type = None  # Override ReportsStream default as this is a constant
+
 
 class ReportsStream(GoogleAdsStream):
     rest_method = "POST"
     parent_stream_type = CustomerHierarchyStream
+
     @property
     def gaql(self):
         raise NotImplementedError
-    
+
     @property
     def path(self):
-        #Paramas
+        # Paramas
         path = "/customers/{client_id}"
         path = path + "/googleAds:search"
         path = path + "?pageSize=10000"
@@ -158,21 +171,24 @@ class ReportsStream(GoogleAdsStream):
         return path
 
 
-    
 class CampaignsStream(ReportsStream):
     """Define custom stream."""
+
     @property
     def gaql(self):
         return """
         SELECT campaign.id, campaign.name FROM campaign ORDER BY campaign.id
         """
+
     records_jsonpath = "$.results[*]"
     name = "stream_campaign"
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "campaign.json"
 
+
 class AdGroupsStream(ReportsStream):
     """Define custom stream."""
+
     @property
     def gaql(self):
         return """
@@ -205,10 +221,12 @@ class AdGroupsStream(ReportsStream):
        ad_group.ad_rotation_mode
        FROM ad_group 
        """
+
     records_jsonpath = "$.results[*]"
     name = "stream_adgroups"
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "ad_group.json"
+
 
 class AdGroupsPerformance(ReportsStream):
     """AdGroups Performance"""
@@ -227,6 +245,7 @@ class AdGroupsPerformance(ReportsStream):
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "adgroups_performance.json"
 
+
 class CampaignPerformance(ReportsStream):
     """Campaign Performance"""
 
@@ -240,6 +259,7 @@ class CampaignPerformance(ReportsStream):
     name = "stream_campaign_performance"
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "campaign_performance.json"
+
 
 class CampaignPerformanceByAgeRangeAndDevice(ReportsStream):
     """Campaign Performance By Age Range and Device"""
@@ -255,6 +275,7 @@ class CampaignPerformanceByAgeRangeAndDevice(ReportsStream):
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "campaign_performance_by_age_range_and_device.json"
 
+
 class CampaignPerformanceByGenderAndDevice(ReportsStream):
     """Campaign Performance By Age Range and Device"""
 
@@ -269,6 +290,7 @@ class CampaignPerformanceByGenderAndDevice(ReportsStream):
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "campaign_performance_by_gender_and_device.json"
 
+
 class CampaignPerformanceByLocation(ReportsStream):
     """Campaign Performance By Age Range and Device"""
 
@@ -282,4 +304,3 @@ class CampaignPerformanceByLocation(ReportsStream):
     name = "stream_campaign_performance_by_location"
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "campaign_performance_by_location.json"
-
