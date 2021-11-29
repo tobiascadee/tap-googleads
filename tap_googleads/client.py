@@ -47,7 +47,7 @@ class GoogleAdsStream(RESTStream):
         auth_url = auth_url + f"&client_secret={self.config.get('client_secret')}"
         auth_url = auth_url + "&grant_type=refresh_token"
 
-        oauth_credentials = self.config.get("oauth_credentials.refresh_proxy_url", {})
+        oauth_credentials = self.config.get("oauth_credentials", {})
 
         if not oauth_credentials:
             return GoogleAdsAuthenticator(stream=self, auth_endpoint=auth_url)

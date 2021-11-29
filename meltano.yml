@@ -39,12 +39,10 @@ plugins:
       required: false
     - name: oauth_credentials.authorization_url
       kind: hidden
-      value: https://oauth2.googleapis.com/token
       label: Optional - OAuth Authorization URL for use with a proxy refresh server
       required: false
     - name: oauth_credentials.scope
       kind: hidden
-      value: https://www.googleapis.com/auth/adwords
       label: Optional - OAuth Scope for use with a proxy refresh server
       required: false
     - name: oauth_credentials.access_token
