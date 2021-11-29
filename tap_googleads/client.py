@@ -10,6 +10,8 @@ from memoization import cached
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
 from singer_sdk.authenticators import OAuthAuthenticator
+from datetime import datetime, timedelta
+from dateutil import parser
 
 from tap_googleads.auth import GoogleAdsAuthenticator, ProxyGoogleAdsAuthenticator
 
@@ -28,6 +30,10 @@ class GoogleAdsStream(RESTStream):
     next_page_token_jsonpath = "$.nextPageToken"  # Or override `get_next_page_token`.
     _LOG_REQUEST_METRIC_URLS: bool = True
 
+    _end_date = "'" + datetime.now().strftime("%Y-%m-%d") + "'"
+    _start_date = datetime.now() - timedelta(days=365)
+    _start_date = "'" + _start_date.strftime("%Y-%m-%d") + "'"
+
     @property
     @cached
     def authenticator(self) -> OAuthAuthenticator:
@@ -41,7 +47,7 @@ class GoogleAdsStream(RESTStream):
         auth_url = auth_url + f"&client_secret={self.config.get('client_secret')}"
         auth_url = auth_url + "&grant_type=refresh_token"
 
-        oauth_credentials = self.config.get("oauth_credentials", {})
+        oauth_credentials = self.config.get("oauth_credentials.refresh_proxy_url", {})
 
         if not oauth_credentials:
             return GoogleAdsAuthenticator(stream=self, auth_endpoint=auth_url)
@@ -70,7 +76,7 @@ class GoogleAdsStream(RESTStream):
         if "user_agent" in self.config:
             headers["User-Agent"] = self.config.get("user_agent")
         headers["developer-token"] = self.config["developer_token"]
-        headers["login-customer-id"] = self.config["login_customer_id"]
+        headers["login-customer-id"] = self.config["customer_id"]
         return headers
 
     def get_next_page_token(
@@ -102,3 +108,20 @@ class GoogleAdsStream(RESTStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
         return params
+
+    @property
+    def start_date(self):
+        date = self.config.get("start_date")
+        if date:
+            date = parser.parse(self.config.get("start_date"))
+            date = "'" + date.strftime("%Y-%m-%d") + "'"
+        return date or self._start_date
+
+    @property
+    def end_date(self):
+        date = self.config.get("end_date")
+        if date:
+            date = parser.parse(self.config.get("end_date"))
+            date = "'" + date.strftime("%Y-%m-%d") + "'"
+        return date or self._end_date
+
