@@ -32,9 +32,9 @@ Settings required to run this tap.
 - `client_secret` (required)
 - `developer_token` (required)
 - `refresh_token` (required)
-- `customer_login_id` (required)
 - `customer_id` (required)
 - `start_date` (optional)
+- `end_date` (optional)
 
 How to get these settings can be found in the following Google Ads documentation:
 
@@ -57,13 +57,13 @@ To run the tap yourself It is highly recommended to use the [Using Your Own Cred
 
 These settings for handling your credentials through a Proxy OAuth Server, these settings are used by default in a [Matatika](https://www.matatika.com/) workspace.
 
-The benefit to using these settings in your [Matatika](https://www.matatika.com/) workspace is that you do not have to get or provide any of the OAuth credentials. All a user needs to do it allow the Matatika App permissions to access your GoogleAds data, and choose what `customer_login_id` and `customer_id` you want to get data from.
+The benefit to using these settings in your [Matatika](https://www.matatika.com/) workspace is that you do not have to get or provide any of the OAuth credentials. All a user needs to do it allow the Matatika App permissions to access your GoogleAds data, and choose what `customer_id` you want to get data from.
 
 All you need to provide in your [Matatika](https://www.matatika.com/) workspace are:
 - Permissions for our app to access your google account through an OAuth screen
-- `customer_login_id` (required)
 - `customer_id` (required)
 - `start_date` (optional)
+- `end_date` (optional)
 
 These are not intended for a user to set manually, as such setting them could cause some config conflicts that will now allow the tap to work correctly.
 

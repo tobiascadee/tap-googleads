@@ -23,7 +23,6 @@ class TestTapGoogleadsWithProxyOAuthCredentials(unittest.TestCase):
                 "authorization_url": "https://oauth2.googleapis.com/token",
             },
             "customer_id": "1234",
-            "login_customer_id": "1234",
             "developer_token": "1234",
         }
         responses.reset()

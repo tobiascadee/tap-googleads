@@ -21,9 +21,10 @@ plugins:
       kind: password
     - name: customer_id
       kind: password
-    - name: login_customer_id
-      kind: password
     - name: start_date
+      kind: date_iso8601
+    - name: end_date
+      kind: date_iso8601
     - name: oauth_credentials.client_id
       env_aliases:
       - OAUTH_REFRESH_CLIENT_ID
@@ -64,8 +65,6 @@ plugins:
       kind: hidden
       label: Optional - OAuth Refresh Proxy URL is the URL for your proxy refresh server
       required: false
-    config:
-      start_date: '2010-01-01T00:00:00Z'
   loaders:
   - name: target-jsonl
     variant: andyh1203
