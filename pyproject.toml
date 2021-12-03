@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "tap-googleads"
-version = "0.0.4"
+version = "0.1.0"
 description = "`tap-googleads` is a Singer tap for GoogleAds, built with the Meltano SDK for Singer Taps."
-authors = ["AutoIDM"]
+authors = ["AutoIDM", "Matatika"]
 keywords = [
     "ELT",
     "GoogleAds",
