@@ -40,17 +40,24 @@ class GoogleAdsStream(RESTStream):
         """Return a new authenticator object."""
         base_auth_url = "https://www.googleapis.com/oauth2/v4/token"
         # Silly way to do parameters but it works
-        auth_url = (
-            base_auth_url + f"?refresh_token={self.config.get('refresh_token', None)}"
+
+        client_id = self.config.get("oauth_credentials", {}).get("client_id", None)
+        client_secret = self.config.get("oauth_credentials", {}).get(
+            "client_secret", None
         )
-        auth_url = auth_url + f"&client_id={self.config.get('client_id')}"
-        auth_url = auth_url + f"&client_secret={self.config.get('client_secret')}"
+        refresh_token = self.config.get("oauth_credentials", {}).get(
+            "refresh_token", None
+        )
+
+        auth_url = base_auth_url + f"?refresh_token={refresh_token}"
+        auth_url = auth_url + f"&client_id={client_id}"
+        auth_url = auth_url + f"&client_secret={client_secret}"
         auth_url = auth_url + "&grant_type=refresh_token"
 
-        oauth_credentials = self.config.get("oauth_credentials", {})
-
-        if not oauth_credentials:
+        if client_id and client_secret and refresh_token:
             return GoogleAdsAuthenticator(stream=self, auth_endpoint=auth_url)
+
+        oauth_credentials = self.config.get("oauth_credentials", {})
 
         auth_body = {}
         auth_headers = {}

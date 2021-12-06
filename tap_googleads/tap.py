@@ -42,11 +42,11 @@ class TapGoogleAds(Tap):
     # TODO: Add Descriptions
     config_jsonschema = th.PropertiesList(
         th.Property(
-            "client_id",
+            "oauth_credentials.client_id",
             th.StringType,
         ),
         th.Property(
-            "client_secret",
+            "oauth_credentials.client_secret",
             th.StringType,
         ),
         th.Property(
@@ -54,7 +54,7 @@ class TapGoogleAds(Tap):
             th.StringType,
         ),
         th.Property(
-            "refresh_token",
+            "oauth_credentials.refresh_token",
             th.StringType,
         ),
         th.Property(
