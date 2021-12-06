@@ -11,13 +11,7 @@ plugins:
     - catalog
     - discover
     settings:
-    - name: client_id
-      kind: password
-    - name: client_secret
-      kind: password
     - name: developer_token
-      kind: password
-    - name: refresh_token
       kind: password
     - name: customer_id
       kind: password
@@ -50,7 +44,6 @@ plugins:
       - OAUTH_CREDENTIALS_ACCESS_TOKEN
       kind: hidden
       label: Optional - OAuth Access Token for use with a proxy refresh server
-      required: false
     - name: oauth_credentials.refresh_token
       env_aliases:
       - OAUTH_CREDENTIALS_REFRESH_TOKEN
