@@ -22,6 +22,7 @@ class CustomerStream(GoogleAdsStream):
         return "/customers/" + self.config["customer_id"]
 
     name = "stream_customers"
+    primary_keys = ["id"]
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "customer.json"
 
@@ -31,7 +32,7 @@ class AccessibleCustomers(GoogleAdsStream):
 
     path = "/customers:listAccessibleCustomers"
     name = "stream_accessible_customers"
-    primary_keys = None
+    primary_keys = ["resource_names"]
     replication_key = None
     # TODO add an assert for one record
     #    schema_filepath = SCHEMAS_DIR / "customer.json"
@@ -83,9 +84,9 @@ class CustomerHierarchyStream(GoogleAdsStream):
 
     records_jsonpath = "$.results[*]"
     name = "stream_customer_hierarchy"
+    primary_keys = ["customer_client__id"]
     replication_key = None
     parent_stream_type = AccessibleCustomers
-    # schema_filepath = SCHEMAS_DIR / "campaign.json"
     schema = th.PropertiesList(
         th.Property(
             "customerClient",
@@ -148,6 +149,7 @@ class GeotargetsStream(GoogleAdsStream):
     """
     records_jsonpath = "$.results[*]"
     name = "stream_geo_target_constant"
+    primary_keys = ["geo_target_constant__id"]
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "geo_target_constant.json"
     parent_stream_type = None  # Override ReportsStream default as this is a constant
@@ -182,6 +184,7 @@ class CampaignsStream(ReportsStream):
 
     records_jsonpath = "$.results[*]"
     name = "stream_campaign"
+    primary_keys = ["campaign__id"]
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "campaign.json"
 
@@ -224,6 +227,7 @@ class AdGroupsStream(ReportsStream):
 
     records_jsonpath = "$.results[*]"
     name = "stream_adgroups"
+    primary_keys = ["ad_group__id", "ad_group__campaign", "ad_group__status"]
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "ad_group.json"
 
@@ -242,6 +246,7 @@ class AdGroupsPerformance(ReportsStream):
 
     records_jsonpath = "$.results[*]"
     name = "stream_adgroupsperformance"
+    primary_keys = ["campaign__id", "ad_group__id"]
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "adgroups_performance.json"
 
@@ -257,6 +262,7 @@ class CampaignPerformance(ReportsStream):
 
     records_jsonpath = "$.results[*]"
     name = "stream_campaign_performance"
+    primary_keys = ["campaign__name", "campaign__status", "segments__date", "segments__device"]
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "campaign_performance.json"
 
@@ -272,6 +278,7 @@ class CampaignPerformanceByAgeRangeAndDevice(ReportsStream):
 
     records_jsonpath = "$.results[*]"
     name = "stream_campaign_performance_by_age_range_and_device"
+    primary_keys = ["ad_group_criterion__age_range__type", "campaign__name", "segments__date", "campaign__status", "segments__device"]
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "campaign_performance_by_age_range_and_device.json"
 
@@ -287,6 +294,7 @@ class CampaignPerformanceByGenderAndDevice(ReportsStream):
 
     records_jsonpath = "$.results[*]"
     name = "stream_campaign_performance_by_gender_and_device"
+    primary_keys = ["ad_group_criterion__gender__type", "campaign__name", "segments__date", "campaign__status", "segments__device"]
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "campaign_performance_by_gender_and_device.json"
 
@@ -302,5 +310,6 @@ class CampaignPerformanceByLocation(ReportsStream):
 
     records_jsonpath = "$.results[*]"
     name = "stream_campaign_performance_by_location"
+    primary_keys = ["campaign_criterion__location__geo_target_constant", "campaign__name", "segments__date"]
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "campaign_performance_by_location.json"
