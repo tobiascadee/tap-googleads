@@ -1,26 +1,29 @@
 # tap-googleads
 
-This fork of `tap-googleads` supports the meltano varient of `target-postgres` and will sync ONLY the GoogleAds data under your specified `customer_id`.
-
 `tap-googleads` is a Singer tap for GoogleAds.
 
-Bearer tokens sometimes slip out to logs. Use at your own Peril :D
+This fork of `tap-googleads` will sync your GoogleAds data under the specified `customer_id`.
 
 Built with the [Meltano Tap SDK](https://sdk.meltano.com) for Singer Taps.
 
 ## Installation
 
-- [ ] `Developer TODO:` Update the below as needed to correctly describe the install procedure. For instance, if you do not have a PyPi repo, or if you want users to directly install from your git repo, you can modify this step as appropriate.
+To install and use this tap with Meltano:
 
 ```bash
-pipx install tap-googleads
+meltano add extractor tap-googleads
 ```
+
+To use standalone, you can use the following:
+
+```bash
+pip install https://github.com/Matatika/tap-googleads.git
+```
+
 
 ## Configuration
 
 ### Accepted Config Options
-
-- [ ] `Developer TODO:` Provide a list of config options accepted by the tap.
 
 ### This tap supports two sets of configs:
 
@@ -31,7 +34,6 @@ Settings required to run this tap.
 - `oauth_credentials.client_id` (required)
 - `oauth_credentials.client_secret` (required)
 - `oauth_credentials.refresh_token` (required)
-- `developer_token` (required)
 - `customer_id` (required)
 - `start_date` (optional)
 - `end_date` (optional)
@@ -44,12 +46,6 @@ If you have installed the tap you can run the following commands to see more inf
 ```bash
 tap-googleads --about
 ```
-
-### Getting A Refresh Token
-1. GET https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=client_id&redirect_uri=http://127.0.0.1&scope=https://www.googleapis.com/auth/adwords&state=autoidm&access_type=offline&prompt=select_account&include_granted_scopes=true
-1. POST https://www.googleapis.com/oauth2/v4/token?code={code}&client_id={client_id}&client_secret={client_secret}&redirect_uri=http://127.0.0.1&grant_type=authorization_code
-1. POST https://www.googleapis.com/oauth2/v4/token?refresh_token={refresh_token}&client_id={client_id}&client_secret={client_secret}&grant_type=refresh_token
-
 
 ### Proxy OAuth Credentials
 
@@ -80,8 +76,6 @@ Also set in by default in your [Matatika](https://www.matatika.com/) workspace e
 
 ### Source Authentication and Authorization
 
-- [ ] `Developer TODO:` If your tap requires special access on the source system, or any special authentication requirements, provide those here.
-
 ## Usage
 
 You can easily run `tap-googleads` by itself or in a pipeline using [Meltano](https://meltano.com/).
@@ -96,7 +90,6 @@ tap-googleads --config CONFIG --discover > ./catalog.json
 
 ## Developer Resources
 
-- [ ] `Developer TODO:` As a first step, scan the entire project for the text "`TODO:`" and complete any recommended steps, deleting the "TODO" references once completed.
 
 ### Initialize your Development Environment
 
