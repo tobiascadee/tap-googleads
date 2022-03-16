@@ -43,6 +43,8 @@ How to get these settings can be found in the following Google Ads documentation
 
 https://developers.google.com/adwords/api/docs/guides/authentication
 
+https://developers.google.com/google-ads/api/docs/first-call/dev-token
+
 If you have installed the tap you can run the following commands to see more information about the tap.
 ```bash
 tap-googleads --about
