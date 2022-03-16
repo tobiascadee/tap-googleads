@@ -34,6 +34,7 @@ Settings required to run this tap.
 - `oauth_credentials.client_id` (required)
 - `oauth_credentials.client_secret` (required)
 - `oauth_credentials.refresh_token` (required)
+- `developer_token` (required)
 - `customer_id` (required)
 - `start_date` (optional)
 - `end_date` (optional)
