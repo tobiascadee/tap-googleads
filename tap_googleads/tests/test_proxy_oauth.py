@@ -14,9 +14,6 @@ class TestTapGoogleadsWithProxyOAuthCredentials(unittest.TestCase):
     def setUp(self):
         self.mock_config = {
             "oauth_credentials": {
-                "client_id": "1234",
-                "client_secret": "1234",
-                "refresh_token": "1234",
                 "refresh_proxy_url": "http://localhost:8080/api/tokens/oauth2-google/token",
                 "refresh_proxy_url_auth": "Bearer proxy_url_token",
                 "scope": "https://www.googleapis.com/auth/adwords",
@@ -42,7 +39,7 @@ class TestTapGoogleadsWithProxyOAuthCredentials(unittest.TestCase):
         """Test proxy oauth refresh"""
 
         tap = test_utils.set_up_tap_with_custom_catalog(
-            self.mock_config, ["accessible_customers"]
+            self.mock_config, ["stream_accessible_customers"]
         )
 
         responses.add(

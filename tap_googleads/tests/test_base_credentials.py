@@ -14,9 +14,11 @@ class TestTapGoogleadsWithBaseCredentials(unittest.TestCase):
 
     def setUp(self):
         self.mock_config = {
-            "client_id": "1234",
-            "client_secret": "1234",
-            "refresh_token": "1234",
+            "oauth_credentials": {
+                "client_id": "1234",
+                "client_secret": "1234",
+                "refresh_token": "1234",
+            },
             "customer_id": "1234",
             "developer_token": "1234",
         }
@@ -38,7 +40,7 @@ class TestTapGoogleadsWithBaseCredentials(unittest.TestCase):
         """Test sync."""
 
         tap = test_utils.set_up_tap_with_custom_catalog(
-            self.mock_config, ["accessible_customers"]
+            self.mock_config, ["stream_accessible_customers"]
         )
 
         responses.add(

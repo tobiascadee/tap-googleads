@@ -262,7 +262,12 @@ class CampaignPerformance(ReportsStream):
 
     records_jsonpath = "$.results[*]"
     name = "stream_campaign_performance"
-    primary_keys = ["campaign__name", "campaign__status", "segments__date", "segments__device"]
+    primary_keys = [
+        "campaign__name",
+        "campaign__status",
+        "segments__date",
+        "segments__device",
+    ]
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "campaign_performance.json"
 
@@ -278,7 +283,13 @@ class CampaignPerformanceByAgeRangeAndDevice(ReportsStream):
 
     records_jsonpath = "$.results[*]"
     name = "stream_campaign_performance_by_age_range_and_device"
-    primary_keys = ["ad_group_criterion__age_range__type", "campaign__name", "segments__date", "campaign__status", "segments__device"]
+    primary_keys = [
+        "ad_group_criterion__age_range__type",
+        "campaign__name",
+        "segments__date",
+        "campaign__status",
+        "segments__device",
+    ]
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "campaign_performance_by_age_range_and_device.json"
 
@@ -294,7 +305,13 @@ class CampaignPerformanceByGenderAndDevice(ReportsStream):
 
     records_jsonpath = "$.results[*]"
     name = "stream_campaign_performance_by_gender_and_device"
-    primary_keys = ["ad_group_criterion__gender__type", "campaign__name", "segments__date", "campaign__status", "segments__device"]
+    primary_keys = [
+        "ad_group_criterion__gender__type",
+        "campaign__name",
+        "segments__date",
+        "campaign__status",
+        "segments__device",
+    ]
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "campaign_performance_by_gender_and_device.json"
 
@@ -310,6 +327,10 @@ class CampaignPerformanceByLocation(ReportsStream):
 
     records_jsonpath = "$.results[*]"
     name = "stream_campaign_performance_by_location"
-    primary_keys = ["campaign_criterion__location__geo_target_constant", "campaign__name", "segments__date"]
+    primary_keys = [
+        "campaign_criterion__location__geo_target_constant",
+        "campaign__name",
+        "segments__date",
+    ]
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "campaign_performance_by_location.json"
