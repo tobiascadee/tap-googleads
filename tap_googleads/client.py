@@ -24,7 +24,7 @@ LOGGER = singer.get_logger()
 class GoogleAdsStream(RESTStream):
     """GoogleAds stream class."""
 
-    url_base = "https://googleads.googleapis.com/v8"
+    url_base = "https://googleads.googleapis.com/v9"
 
     records_jsonpath = "$[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = "$.nextPageToken"  # Or override `get_next_page_token`.
