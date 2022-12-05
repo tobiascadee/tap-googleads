@@ -14,19 +14,6 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 #       - Copy-paste as many times as needed to create multiple stream types.
 
 
-class CustomerStream(GoogleAdsStream):
-    """Define custom stream."""
-
-    @property
-    def path(self):
-        return "/customers/" + self.config["customer_id"]
-
-    name = "stream_customers"
-    primary_keys = ["id"]
-    replication_key = None
-    schema_filepath = SCHEMAS_DIR / "customer.json"
-
-
 class AccessibleCustomers(GoogleAdsStream):
     """Accessible Customers"""
 
@@ -34,8 +21,6 @@ class AccessibleCustomers(GoogleAdsStream):
     name = "stream_accessible_customers"
     primary_keys = ["resource_names"]
     replication_key = None
-    # TODO add an assert for one record
-    #    schema_filepath = SCHEMAS_DIR / "customer.json"
     schema = th.PropertiesList(
         th.Property("resourceNames", th.ArrayType(th.StringType))
     ).to_dict()
@@ -55,13 +40,12 @@ class CustomerHierarchyStream(GoogleAdsStream):
 
     """
 
-    # TODO add a seperate stream to get the Customer information and return i
     rest_method = "POST"
 
     @property
     def path(self):
         # Paramas
-        path = "/customers/{client_id}"
+        path = f"/customers/{self.config.get('customer_id')}"
         path = path + "/googleAds:search"
         path = path + "?pageSize=10000"
         path = path + f"&query={self.gaql}"
@@ -117,7 +101,6 @@ class CustomerHierarchyStream(GoogleAdsStream):
             One item per (possibly processed) record in the API.
         """
 
-        context["client_id"] = self.config.get("customer_id")
         for row in self.request_records(context):
             row = self.post_process(row, context)
             # Don't search Manager accounts as we can't query them for everything
@@ -166,7 +149,7 @@ class ReportsStream(GoogleAdsStream):
     @property
     def path(self):
         # Paramas
-        path = "/customers/{client_id}"
+        path = f"/customers/{self.config.get('customer_id')}"
         path = path + "/googleAds:search"
         path = path + "?pageSize=10000"
         path = path + f"&query={self.gaql}"
