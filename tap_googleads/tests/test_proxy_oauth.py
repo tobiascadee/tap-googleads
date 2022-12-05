@@ -32,7 +32,7 @@ class TestTapGoogleadsWithProxyOAuthCredentials(unittest.TestCase):
         catalog = TapGoogleAds(self.mock_config).discover_streams()
 
         # Assert the correct number of default streams found
-        self.assertEqual(len(catalog), 11, "Total streams from default catalog")
+        self.assertEqual(len(catalog), 10, "Total streams from default catalog")
 
     @responses.activate
     def test_proxy_oauth_refresh(self):
@@ -51,7 +51,7 @@ class TestTapGoogleadsWithProxyOAuthCredentials(unittest.TestCase):
 
         responses.add(
             responses.GET,
-            "https://googleads.googleapis.com/v9/customers:listAccessibleCustomers",
+            "https://googleads.googleapis.com/v12/customers:listAccessibleCustomers",
             json=test_utils.accessible_customer_return_data,
             status=200,
         )
