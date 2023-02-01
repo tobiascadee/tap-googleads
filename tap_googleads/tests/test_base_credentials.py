@@ -33,7 +33,7 @@ class TestTapGoogleadsWithBaseCredentials(unittest.TestCase):
         catalog = TapGoogleAds(self.mock_config).discover_streams()
 
         # expect valid catalog to be discovered
-        self.assertEqual(len(catalog), 10, "Total streams from default catalog")
+        self.assertEqual(len(catalog), 11, "Total streams from default catalog")
 
     @responses.activate
     def test_googleads_sync_accessible_customers(self):

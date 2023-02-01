@@ -317,3 +317,33 @@ class CampaignPerformanceByLocation(ReportsStream):
     ]
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "campaign_performance_by_location.json"
+
+class GeoPerformance(ReportsStream):
+    """Geo performance"""
+
+    @property
+    def gaql(self):
+        return f"""
+    SELECT 
+        campaign.name, 
+        campaign.status, 
+        segments.date, 
+        metrics.clicks, 
+        metrics.cost_micros,
+        metrics.impressions, 
+        metrics.conversions,
+        geographic_view.location_type,
+        geographic_view.country_criterion_id
+    FROM geographic_view 
+    WHERE segments.date >= {self.start_date} and segments.date <= {self.end_date} 
+    """
+
+    records_jsonpath = "$.results[*]"
+    name = "geo_performance"
+    primary_keys = [
+        "geographic_view__country_criterion_id",
+        "campaign__name",
+        "segments__date",
+    ]
+    replication_key = None
+    schema_filepath = SCHEMAS_DIR / "geo_performance.json"

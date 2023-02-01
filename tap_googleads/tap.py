@@ -16,6 +16,7 @@ from tap_googleads.streams import (
     CampaignPerformanceByGenderAndDevice,
     CampaignPerformanceByLocation,
     GeotargetsStream,
+    GeoPerformance
 )
 
 STREAM_TYPES = [
@@ -29,6 +30,7 @@ STREAM_TYPES = [
     CampaignPerformanceByGenderAndDevice,
     CampaignPerformanceByLocation,
     GeotargetsStream,
+    GeoPerformance
 ]
 
 
