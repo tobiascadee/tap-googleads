@@ -35,6 +35,14 @@
         }
       }
     },
+    "segments": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string"
+        }
+      }
+    },
     "geographicView": {
       "type": "object",
       "properties": {
