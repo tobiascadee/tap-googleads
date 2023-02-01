@@ -110,7 +110,7 @@ class CustomerHierarchyStream(GoogleAdsStream):
 
     def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
         """Return a context dictionary for child streams."""
-        return {"client_id": self.config.get("customer_id")}
+        return {"customer_id": self.config.get("customer_id")}
 
 
 class GeotargetsStream(GoogleAdsStream):
@@ -342,8 +342,9 @@ class GeoPerformance(ReportsStream):
     name = "geo_performance"
     primary_keys = [
         "geographic_view__country_criterion_id",
+        "customer_id",
         "campaign__name",
-        "segments__date",
+        "segments__date"
     ]
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "geo_performance.json"
