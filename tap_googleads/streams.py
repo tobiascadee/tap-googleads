@@ -339,7 +339,7 @@ class GeoPerformance(ReportsStream):
     """
 
     records_jsonpath = "$.results[*]"
-    name = "geo_performance"
+    name = "stream_geo_performance"
     primary_keys = [
         "geographic_view__country_criterion_id",
         "customer_id",
