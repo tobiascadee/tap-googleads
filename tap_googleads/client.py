@@ -31,7 +31,7 @@ class GoogleAdsStream(RESTStream):
     _LOG_REQUEST_METRIC_URLS: bool = True
 
     _end_date = "'" + datetime.now().strftime("%Y-%m-%d") + "'"
-    _start_date = datetime.now() - timedelta(days=365)
+    _start_date = datetime.now() - timedelta(days=91)
     _start_date = "'" + _start_date.strftime("%Y-%m-%d") + "'"
 
     @property
