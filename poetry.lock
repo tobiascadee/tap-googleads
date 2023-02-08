@@ -113,7 +113,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7
 
 [[package]]
 name = "cryptography"
-version = "39.0.1"
+version = "38.0.4"
 description = "cryptography is a package which provides cryptographic recipes and primitives to Python developers."
 category = "main"
 optional = false
@@ -123,14 +123,12 @@ python-versions = ">=3.6"
 cffi = ">=1.12"
 
 [package.extras]
-docs = ["sphinx (>=5.3.0)", "sphinx-rtd-theme (>=1.1.1)"]
+docs = ["sphinx (>=1.6.5,!=1.8.0,!=3.1.0,!=3.1.1)", "sphinx-rtd-theme"]
 docstest = ["pyenchant (>=1.6.11)", "sphinxcontrib-spelling (>=4.0.1)", "twine (>=1.12.0)"]
-pep8test = ["black", "check-manifest", "mypy", "ruff", "types-pytz", "types-requests"]
+pep8test = ["black", "flake8", "flake8-import-order", "pep8-naming"]
 sdist = ["setuptools-rust (>=0.11.4)"]
 ssh = ["bcrypt (>=3.1.5)"]
-test = ["hypothesis (>=1.11.4,!=3.79.2)", "iso8601", "pretend", "pytest (>=6.2.0)", "pytest-benchmark", "pytest-cov", "pytest-shard (>=0.1.2)", "pytest-subtests", "pytest-xdist", "pytz"]
-test-randomorder = ["pytest-randomly"]
-tox = ["tox"]
+test = ["hypothesis (>=1.11.4,!=3.79.2)", "iso8601", "pretend", "pytest (>=6.2.0)", "pytest-benchmark", "pytest-cov", "pytest-subtests", "pytest-xdist", "pytz"]
 
 [[package]]
 name = "decorator"
@@ -229,7 +227,7 @@ testing = ["flake8 (<5)", "flufl.flake8", "importlib-resources (>=1.3)", "packag
 
 [[package]]
 name = "importlib-resources"
-version = "5.10.2"
+version = "5.9.0"
 description = "Read resources from Python packages"
 category = "main"
 optional = false
@@ -239,8 +237,8 @@ python-versions = ">=3.7"
 zipp = {version = ">=3.1.0", markers = "python_version < \"3.10\""}
 
 [package.extras]
-docs = ["furo", "jaraco.packaging (>=9)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
-testing = ["flake8 (<5)", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=1.3)", "pytest-flake8", "pytest-mypy (>=0.9.1)"]
+docs = ["jaraco.packaging (>=9)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx"]
+testing = ["pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=1.3)", "pytest-flake8", "pytest-mypy (>=0.9.1)"]
 
 [[package]]
 name = "inflection"
@@ -609,7 +607,7 @@ python-versions = ">=2.5, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
 name = "singer-sdk"
-version = "0.18.0"
+version = "0.13.1"
 description = "A framework for building Singer taps"
 category = "main"
 optional = false
@@ -618,10 +616,10 @@ python-versions = ">=3.7.1,<3.12"
 [package.dependencies]
 backoff = ">=2.0.0,<3.0"
 click = ">=8.0,<9.0"
-cryptography = ">=3.4.6,<40.0.0"
+cryptography = ">=3.4.6,<39.0.0"
 fs = ">=2.4.16,<3.0.0"
 importlib-metadata = {version = "<5.0.0", markers = "python_version < \"3.8\""}
-importlib-resources = {version = "5.10.2", markers = "python_version < \"3.9\""}
+importlib-resources = {version = "5.9.0", markers = "python_version < \"3.9\""}
 inflection = ">=0.5.1,<0.6.0"
 joblib = ">=1.0.1,<2.0.0"
 jsonpath-ng = ">=1.5.3,<2.0.0"
@@ -638,8 +636,7 @@ sqlalchemy = ">=1.4,<2.0"
 typing-extensions = ">=4.2.0,<5.0.0"
 
 [package.extras]
-docs = ["myst-parser (>=0.17.2,<0.19.0)", "sphinx (>=4.5,<6.0)", "sphinx-autobuild (>=2021.3.14,<2022.0.0)", "sphinx-copybutton (>=0.3.1,<0.6.0)", "sphinx-rtd-theme (>=0.5.2,<1.2.0)"]
-s3 = ["fs-s3fs (>=1.1.1,<2.0.0)"]
+docs = ["myst-parser (>=0.17.2,<0.19.0)", "sphinx (>=4.5,<6.0)", "sphinx-autobuild (>=2021.3.14,<2022.0.0)", "sphinx-copybutton (>=0.3.1,<0.6.0)", "sphinx-rtd-theme (>=0.5.2,<1.1.0)"]
 
 [[package]]
 name = "six"
@@ -810,7 +807,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "<3.12,>=3.7.1"
-content-hash = "512692c2b042568fdd1cc5008108ffb241b08f047db1ef6ceb4380862a63f92e"
+content-hash = "2c10f45662b430646fb06989e1b426567cf118a7bdd254b9eb0b432cd01680c7"
 
 [metadata.files]
 appdirs = [
@@ -1001,27 +998,32 @@ colorama = [
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
 ]
 cryptography = [
-    {file = "cryptography-39.0.1-cp36-abi3-macosx_10_12_universal2.whl", hash = "sha256:6687ef6d0a6497e2b58e7c5b852b53f62142cfa7cd1555795758934da363a965"},
-    {file = "cryptography-39.0.1-cp36-abi3-macosx_10_12_x86_64.whl", hash = "sha256:706843b48f9a3f9b9911979761c91541e3d90db1ca905fd63fee540a217698bc"},
-    {file = "cryptography-39.0.1-cp36-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.manylinux_2_24_aarch64.whl", hash = "sha256:5d2d8b87a490bfcd407ed9d49093793d0f75198a35e6eb1a923ce1ee86c62b41"},
-    {file = "cryptography-39.0.1-cp36-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:83e17b26de248c33f3acffb922748151d71827d6021d98c70e6c1a25ddd78505"},
-    {file = "cryptography-39.0.1-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e124352fd3db36a9d4a21c1aa27fd5d051e621845cb87fb851c08f4f75ce8be6"},
-    {file = "cryptography-39.0.1-cp36-abi3-manylinux_2_24_x86_64.whl", hash = "sha256:5aa67414fcdfa22cf052e640cb5ddc461924a045cacf325cd164e65312d99502"},
-    {file = "cryptography-39.0.1-cp36-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:35f7c7d015d474f4011e859e93e789c87d21f6f4880ebdc29896a60403328f1f"},
-    {file = "cryptography-39.0.1-cp36-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:f24077a3b5298a5a06a8e0536e3ea9ec60e4c7ac486755e5fb6e6ea9b3500106"},
-    {file = "cryptography-39.0.1-cp36-abi3-musllinux_1_1_aarch64.whl", hash = "sha256:f0c64d1bd842ca2633e74a1a28033d139368ad959872533b1bab8c80e8240a0c"},
-    {file = "cryptography-39.0.1-cp36-abi3-musllinux_1_1_x86_64.whl", hash = "sha256:0f8da300b5c8af9f98111ffd512910bc792b4c77392a9523624680f7956a99d4"},
-    {file = "cryptography-39.0.1-cp36-abi3-win32.whl", hash = "sha256:fe913f20024eb2cb2f323e42a64bdf2911bb9738a15dba7d3cce48151034e3a8"},
-    {file = "cryptography-39.0.1-cp36-abi3-win_amd64.whl", hash = "sha256:ced4e447ae29ca194449a3f1ce132ded8fcab06971ef5f618605aacaa612beac"},
-    {file = "cryptography-39.0.1-pp38-pypy38_pp73-macosx_10_12_x86_64.whl", hash = "sha256:807ce09d4434881ca3a7594733669bd834f5b2c6d5c7e36f8c00f691887042ad"},
-    {file = "cryptography-39.0.1-pp38-pypy38_pp73-win_amd64.whl", hash = "sha256:96f1157a7c08b5b189b16b47bc9db2332269d6680a196341bf30046330d15388"},
-    {file = "cryptography-39.0.1-pp39-pypy39_pp73-macosx_10_12_x86_64.whl", hash = "sha256:e422abdec8b5fa8462aa016786680720d78bdce7a30c652b7fadf83a4ba35336"},
-    {file = "cryptography-39.0.1-pp39-pypy39_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.manylinux_2_24_aarch64.whl", hash = "sha256:b0afd054cd42f3d213bf82c629efb1ee5f22eba35bf0eec88ea9ea7304f511a2"},
-    {file = "cryptography-39.0.1-pp39-pypy39_pp73-manylinux_2_24_x86_64.whl", hash = "sha256:6f8ba7f0328b79f08bdacc3e4e66fb4d7aab0c3584e0bd41328dce5262e26b2e"},
-    {file = "cryptography-39.0.1-pp39-pypy39_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:ef8b72fa70b348724ff1218267e7f7375b8de4e8194d1636ee60510aae104cd0"},
-    {file = "cryptography-39.0.1-pp39-pypy39_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:aec5a6c9864be7df2240c382740fcf3b96928c46604eaa7f3091f58b878c0bb6"},
-    {file = "cryptography-39.0.1-pp39-pypy39_pp73-win_amd64.whl", hash = "sha256:fdd188c8a6ef8769f148f88f859884507b954cc64db6b52f66ef199bb9ad660a"},
-    {file = "cryptography-39.0.1.tar.gz", hash = "sha256:d1f6198ee6d9148405e49887803907fe8962a23e6c6f83ea7d98f1c0de375695"},
+    {file = "cryptography-38.0.4-cp36-abi3-macosx_10_10_universal2.whl", hash = "sha256:2fa36a7b2cc0998a3a4d5af26ccb6273f3df133d61da2ba13b3286261e7efb70"},
+    {file = "cryptography-38.0.4-cp36-abi3-macosx_10_10_x86_64.whl", hash = "sha256:1f13ddda26a04c06eb57119caf27a524ccae20533729f4b1e4a69b54e07035eb"},
+    {file = "cryptography-38.0.4-cp36-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.manylinux_2_24_aarch64.whl", hash = "sha256:2ec2a8714dd005949d4019195d72abed84198d877112abb5a27740e217e0ea8d"},
+    {file = "cryptography-38.0.4-cp36-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:50a1494ed0c3f5b4d07650a68cd6ca62efe8b596ce743a5c94403e6f11bf06c1"},
+    {file = "cryptography-38.0.4-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a10498349d4c8eab7357a8f9aa3463791292845b79597ad1b98a543686fb1ec8"},
+    {file = "cryptography-38.0.4-cp36-abi3-manylinux_2_24_x86_64.whl", hash = "sha256:10652dd7282de17990b88679cb82f832752c4e8237f0c714be518044269415db"},
+    {file = "cryptography-38.0.4-cp36-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:bfe6472507986613dc6cc00b3d492b2f7564b02b3b3682d25ca7f40fa3fd321b"},
+    {file = "cryptography-38.0.4-cp36-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:ce127dd0a6a0811c251a6cddd014d292728484e530d80e872ad9806cfb1c5b3c"},
+    {file = "cryptography-38.0.4-cp36-abi3-musllinux_1_1_aarch64.whl", hash = "sha256:53049f3379ef05182864d13bb9686657659407148f901f3f1eee57a733fb4b00"},
+    {file = "cryptography-38.0.4-cp36-abi3-musllinux_1_1_x86_64.whl", hash = "sha256:8a4b2bdb68a447fadebfd7d24855758fe2d6fecc7fed0b78d190b1af39a8e3b0"},
+    {file = "cryptography-38.0.4-cp36-abi3-win32.whl", hash = "sha256:1d7e632804a248103b60b16fb145e8df0bc60eed790ece0d12efe8cd3f3e7744"},
+    {file = "cryptography-38.0.4-cp36-abi3-win_amd64.whl", hash = "sha256:8e45653fb97eb2f20b8c96f9cd2b3a0654d742b47d638cf2897afbd97f80fa6d"},
+    {file = "cryptography-38.0.4-pp37-pypy37_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ca57eb3ddaccd1112c18fc80abe41db443cc2e9dcb1917078e02dfa010a4f353"},
+    {file = "cryptography-38.0.4-pp37-pypy37_pp73-manylinux_2_24_x86_64.whl", hash = "sha256:c9e0d79ee4c56d841bd4ac6e7697c8ff3c8d6da67379057f29e66acffcd1e9a7"},
+    {file = "cryptography-38.0.4-pp37-pypy37_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:0e70da4bdff7601b0ef48e6348339e490ebfb0cbe638e083c9c41fb49f00c8bd"},
+    {file = "cryptography-38.0.4-pp38-pypy38_pp73-macosx_10_10_x86_64.whl", hash = "sha256:998cd19189d8a747b226d24c0207fdaa1e6658a1d3f2494541cb9dfbf7dcb6d2"},
+    {file = "cryptography-38.0.4-pp38-pypy38_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:67461b5ebca2e4c2ab991733f8ab637a7265bb582f07c7c88914b5afb88cb95b"},
+    {file = "cryptography-38.0.4-pp38-pypy38_pp73-manylinux_2_24_x86_64.whl", hash = "sha256:4eb85075437f0b1fd8cd66c688469a0c4119e0ba855e3fef86691971b887caf6"},
+    {file = "cryptography-38.0.4-pp38-pypy38_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:3178d46f363d4549b9a76264f41c6948752183b3f587666aff0555ac50fd7876"},
+    {file = "cryptography-38.0.4-pp38-pypy38_pp73-win_amd64.whl", hash = "sha256:6391e59ebe7c62d9902c24a4d8bcbc79a68e7c4ab65863536127c8a9cd94043b"},
+    {file = "cryptography-38.0.4-pp39-pypy39_pp73-macosx_10_10_x86_64.whl", hash = "sha256:78e47e28ddc4ace41dd38c42e6feecfdadf9c3be2af389abbfeef1ff06822285"},
+    {file = "cryptography-38.0.4-pp39-pypy39_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:2fb481682873035600b5502f0015b664abc26466153fab5c6bc92c1ea69d478b"},
+    {file = "cryptography-38.0.4-pp39-pypy39_pp73-manylinux_2_24_x86_64.whl", hash = "sha256:4367da5705922cf7070462e964f66e4ac24162e22ab0a2e9d31f1b270dd78083"},
+    {file = "cryptography-38.0.4-pp39-pypy39_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:b4cad0cea995af760f82820ab4ca54e5471fc782f70a007f31531957f43e9dee"},
+    {file = "cryptography-38.0.4-pp39-pypy39_pp73-win_amd64.whl", hash = "sha256:80ca53981ceeb3241998443c4964a387771588c4e4a5d92735a493af868294f9"},
+    {file = "cryptography-38.0.4.tar.gz", hash = "sha256:175c1a818b87c9ac80bb7377f5520b7f31b3ef2a0004e2420319beadedb67290"},
 ]
 decorator = [
     {file = "decorator-5.1.1-py3-none-any.whl", hash = "sha256:b8c3f85900b9dc423225913c5aace94729fe1fa9763b38939a95226f02d37186"},
@@ -1114,8 +1116,8 @@ importlib-metadata = [
     {file = "importlib_metadata-4.13.0.tar.gz", hash = "sha256:dd0173e8f150d6815e098fd354f6414b0f079af4644ddfe90c71e2fc6174346d"},
 ]
 importlib-resources = [
-    {file = "importlib_resources-5.10.2-py3-none-any.whl", hash = "sha256:7d543798b0beca10b6a01ac7cafda9f822c54db9e8376a6bf57e0cbd74d486b6"},
-    {file = "importlib_resources-5.10.2.tar.gz", hash = "sha256:e4a96c8cc0339647ff9a5e0550d9f276fc5a01ffa276012b58ec108cfd7b8484"},
+    {file = "importlib_resources-5.9.0-py3-none-any.whl", hash = "sha256:f78a8df21a79bcc30cfd400bdc38f314333de7c0fb619763f6b9dabab8268bb7"},
+    {file = "importlib_resources-5.9.0.tar.gz", hash = "sha256:5481e97fb45af8dcf2f798952625591c58fe599d0735d86b10f54de086a61681"},
 ]
 inflection = [
     {file = "inflection-0.5.1-py2.py3-none-any.whl", hash = "sha256:f38b2b640938a4f35ade69ac3d053042959b62a0f1076a5bbaa1b9526605a8a2"},
@@ -1423,8 +1425,8 @@ simplejson = [
     {file = "simplejson-3.18.3.tar.gz", hash = "sha256:ebb53837c5ffcb6100646018565d3f1afed6f4b185b14b2c9cbccf874fe40157"},
 ]
 singer-sdk = [
-    {file = "singer_sdk-0.18.0-py3-none-any.whl", hash = "sha256:1f68c3378fa9f89389088eff74ecd2066fe19a4547308eefb241ad66cf132807"},
-    {file = "singer_sdk-0.18.0.tar.gz", hash = "sha256:e0a49dfda8b4e183fefa2a932d21cb99584ade5cb8d5897b88fe5d77754aba28"},
+    {file = "singer_sdk-0.13.1-py3-none-any.whl", hash = "sha256:13c651affc15c82743dfb6b7eddfc2bb487d2bd786ec98b3349174444fc2856d"},
+    {file = "singer_sdk-0.13.1.tar.gz", hash = "sha256:b9636843c78de3954e064ec52cb8269950a0c099bdd4c4b96011e16e28f4ca2e"},
 ]
 six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
