@@ -6,8 +6,6 @@ from datetime import datetime
 from typing import Optional
 import requests
 
-
-from singer import utils
 from singer_sdk.authenticators import OAuthAuthenticator, SingletonMeta
 from singer_sdk.helpers._util import utc_now
 from singer_sdk.streams import Stream as RESTStreamBase
@@ -53,7 +51,7 @@ class ProxyGoogleAdsAuthenticator(OAuthAuthenticator, metaclass=SingletonMeta):
             return False
         if not self.expires_in:
             return True
-        if self.expires_in > (utils.now() - self.last_refreshed).total_seconds():
+        if self.expires_in > (datetime.now() - self.last_refreshed).total_seconds():
             return True
         return False
 

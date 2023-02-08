@@ -3,7 +3,6 @@
 from pathlib import Path
 from typing import Any, Dict, Optional
 import requests
-import singer
 
 from memoization import cached
 
@@ -17,8 +16,6 @@ from tap_googleads.auth import GoogleAdsAuthenticator, ProxyGoogleAdsAuthenticat
 
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
-
-LOGGER = singer.get_logger()
 
 
 class GoogleAdsStream(RESTStream):
