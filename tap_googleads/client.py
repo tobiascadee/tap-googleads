@@ -21,7 +21,7 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 class GoogleAdsStream(RESTStream):
     """GoogleAds stream class."""
 
-    url_base = "https://googleads.googleapis.com/v12"
+    url_base = "https://googleads.googleapis.com/v13"
 
     records_jsonpath = "$[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = "$.nextPageToken"  # Or override `get_next_page_token`.
