@@ -192,7 +192,6 @@ class AdGroupsStream(ReportsStream):
        ad_group.labels,
        ad_group.id,
        ad_group.final_url_suffix,
-       ad_group.explorer_auto_optimizer_setting.opt_in,
        ad_group.excluded_parent_asset_field_types,
        ad_group.effective_target_roas_source,
        ad_group.effective_target_roas,
