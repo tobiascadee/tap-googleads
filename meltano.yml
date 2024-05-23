@@ -5,7 +5,7 @@ plugins:
   extractors:
   - name: tap-googleads
     namespace: tap_googleads
-    executable: ./tap-googleads.sh
+    pip_url: -e .
     capabilities:
     - state
     - catalog
