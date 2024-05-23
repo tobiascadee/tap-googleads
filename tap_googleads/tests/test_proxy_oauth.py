@@ -1,11 +1,12 @@
 """Tests the tap using a mock proxy oauth config."""
 
 import unittest
-import responses
-import singer
 
-from tap_googleads.tap import TapGoogleAds
+import responses
+import singer_sdk._singerlib as singer
+
 import tap_googleads.tests.utils as test_utils
+from tap_googleads.tap import TapGoogleAds
 
 
 class TestTapGoogleadsWithProxyOAuthCredentials(unittest.TestCase):
@@ -29,7 +30,7 @@ class TestTapGoogleadsWithProxyOAuthCredentials(unittest.TestCase):
     def test_proxy_oauth_discovery(self):
         """Test basic discover sync with proxy refresh credentials"""
 
-        catalog = TapGoogleAds(self.mock_config).discover_streams()
+        catalog = TapGoogleAds(config=self.mock_config).discover_streams()
 
         # Assert the correct number of default streams found
         self.assertEqual(len(catalog), 11, "Total streams from default catalog")
@@ -51,7 +52,7 @@ class TestTapGoogleadsWithProxyOAuthCredentials(unittest.TestCase):
 
         responses.add(
             responses.GET,
-            "https://googleads.googleapis.com/v12/customers:listAccessibleCustomers",
+            "https://googleads.googleapis.com/v14/customers:listAccessibleCustomers",
             json=test_utils.accessible_customer_return_data,
             status=200,
         )

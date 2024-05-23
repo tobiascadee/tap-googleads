@@ -1,12 +1,12 @@
 """Tests the tap using a mock base credentials config."""
 
 import unittest
-import responses
-import singer
 
-from tap_googleads.tap import TapGoogleAds
+import responses
+import singer_sdk._singerlib as singer
 
 import tap_googleads.tests.utils as test_utils
+from tap_googleads.tap import TapGoogleAds
 
 
 class TestTapGoogleadsWithBaseCredentials(unittest.TestCase):
@@ -30,7 +30,7 @@ class TestTapGoogleadsWithBaseCredentials(unittest.TestCase):
     def test_base_credentials_discovery(self):
         """Test basic discover sync with Bearer Token"""
 
-        catalog = TapGoogleAds(self.mock_config).discover_streams()
+        catalog = TapGoogleAds(config=self.mock_config).discover_streams()
 
         # expect valid catalog to be discovered
         self.assertEqual(len(catalog), 11, "Total streams from default catalog")
