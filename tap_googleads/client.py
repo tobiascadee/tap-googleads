@@ -1,21 +1,16 @@
 """REST client handling, including GoogleAdsStream base class."""
 
-from pathlib import Path
+from datetime import datetime, timedelta
 from typing import Any, Dict, Optional
+
 import requests
-
+from dateutil import parser
 from memoization import cached
-
+from singer_sdk.authenticators import OAuthAuthenticator
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
-from singer_sdk.authenticators import OAuthAuthenticator
-from datetime import datetime, timedelta
-from dateutil import parser
 
 from tap_googleads.auth import GoogleAdsAuthenticator, ProxyGoogleAdsAuthenticator
-
-
-SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
 class GoogleAdsStream(RESTStream):
