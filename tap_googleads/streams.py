@@ -1,12 +1,11 @@
 """Stream type classes for tap-googleads."""
 
 from pathlib import Path
-from typing import Any, Dict, Optional, Union, List, Iterable
+from typing import Any, Dict, Iterable, Optional
 
 from singer_sdk import typing as th  # JSON Schema typing helpers
 
 from tap_googleads.client import GoogleAdsStream
-from tap_googleads.auth import GoogleAdsAuthenticator
 
 # TODO: Delete this is if not using json files for schema definition
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
@@ -317,6 +316,7 @@ class CampaignPerformanceByLocation(ReportsStream):
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "campaign_performance_by_location.json"
 
+
 class GeoPerformance(ReportsStream):
     """Geo performance"""
 
@@ -343,7 +343,7 @@ class GeoPerformance(ReportsStream):
         "geographic_view__country_criterion_id",
         "customer_id",
         "campaign__name",
-        "segments__date"
+        "segments__date",
     ]
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "geo_performance.json"

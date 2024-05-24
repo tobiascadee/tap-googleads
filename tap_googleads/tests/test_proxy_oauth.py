@@ -86,4 +86,3 @@ class TestTapGoogleadsWithProxyOAuthCredentials(unittest.TestCase):
 
         for msg in test_utils.SINGER_MESSAGES[3:]:
             self.assertIsInstance(msg, singer.StateMessage)
-

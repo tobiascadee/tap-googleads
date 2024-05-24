@@ -2,21 +2,21 @@
 
 from typing import List
 
-from singer_sdk import Tap, Stream
+from singer_sdk import Stream, Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
 
 from tap_googleads.streams import (
-    CampaignsStream,
-    AdGroupsStream,
-    AdGroupsPerformance,
     AccessibleCustomers,
-    CustomerHierarchyStream,
+    AdGroupsPerformance,
+    AdGroupsStream,
     CampaignPerformance,
     CampaignPerformanceByAgeRangeAndDevice,
     CampaignPerformanceByGenderAndDevice,
     CampaignPerformanceByLocation,
+    CampaignsStream,
+    CustomerHierarchyStream,
+    GeoPerformance,
     GeotargetsStream,
-    GeoPerformance
 )
 
 STREAM_TYPES = [
@@ -30,7 +30,7 @@ STREAM_TYPES = [
     CampaignPerformanceByGenderAndDevice,
     CampaignPerformanceByLocation,
     GeotargetsStream,
-    GeoPerformance
+    GeoPerformance,
 ]
 
 
