@@ -16,7 +16,7 @@ from tap_googleads.auth import GoogleAdsAuthenticator, ProxyGoogleAdsAuthenticat
 class GoogleAdsStream(RESTStream):
     """GoogleAds stream class."""
 
-    url_base = "https://googleads.googleapis.com/v14"
+    url_base = "https://googleads.googleapis.com/v16"
 
     records_jsonpath = "$[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = "$.nextPageToken"  # Or override `get_next_page_token`.
