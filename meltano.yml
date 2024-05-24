@@ -1,6 +1,9 @@
 version: 1
 send_anonymous_usage_stats: true
-project_id: 3a2ff195-c7b9-43e6-9dd7-a3e1d98b543b
+project_id: tap-googleads
+default_environment: test
+environments:
+- name: test
 plugins:
   extractors:
   - name: tap-googleads
@@ -55,6 +58,12 @@ plugins:
       - OAUTH_CREDENTIALS_REFRESH_PROXY_URL
       kind: hidden
       label: Optional - OAuth Refresh Proxy URL is the URL for your proxy refresh server
+      required: false
+    - name: oauth_credentials.refresh_proxy_url_auth
+      env_aliases:
+      - OAUTH_CREDENTIALS_REFRESH_PROXY_URL_AUTH
+      kind: hidden
+      label: Optional - OAuth Refresh Proxy URL Auth is the authentication your proxy refresh server
       required: false
   loaders:
   - name: target-jsonl
