@@ -79,7 +79,7 @@
             "type": "object",
             "properties": {
                 "clicks": {
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         }
