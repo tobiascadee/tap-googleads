@@ -26,7 +26,7 @@ class AccessibleCustomers(GoogleAdsStream):
 
     def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
         """Return a context dictionary for child streams."""
-        return {"resourceNames": ["customers/" + self.config.get("customer_id")]}
+        return {"resourceNames": ["customers/" + self.config.get('login_customer_id', self.config.get('customer_id'))]}
 
 
 class CustomerHierarchyStream(GoogleAdsStream):
@@ -44,7 +44,7 @@ class CustomerHierarchyStream(GoogleAdsStream):
     @property
     def path(self):
         # Paramas
-        path = f"/customers/{self.config.get('customer_id')}"
+        path = f"/customers/{self.config.get('login_customer_id', self.config.get('customer_id'))}"
         path = path + "/googleAds:search"
         path = path + "?pageSize=10000"
         path = path + f"&query={self.gaql}"
@@ -109,7 +109,7 @@ class CustomerHierarchyStream(GoogleAdsStream):
 
     def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
         """Return a context dictionary for child streams."""
-        return {"customer_id": self.config.get("customer_id")}
+        return {"customer_id": record["customerClient"]["id"]}
 
 
 class GeotargetsStream(GoogleAdsStream):
@@ -120,7 +120,7 @@ class GeotargetsStream(GoogleAdsStream):
     @property
     def path(self):
         # Paramas
-        path = f"/customers/{self.config.get('customer_id')}"
+        path = "/customers/{customer_id}"
         path = path + "/googleAds:search"
         path = path + "?pageSize=10000"
         path = path + f"&query={self.gaql}"
@@ -148,7 +148,7 @@ class ReportsStream(GoogleAdsStream):
     @property
     def path(self):
         # Paramas
-        path = f"/customers/{self.config.get('customer_id')}"
+        path = "/customers/{customer_id}"
         path = path + "/googleAds:search"
         path = path + "?pageSize=10000"
         path = path + f"&query={self.gaql}"
