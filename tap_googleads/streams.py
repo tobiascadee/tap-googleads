@@ -103,7 +103,7 @@ class CustomerHierarchyStream(GoogleAdsStream):
             customer_id_array = self.config.get("array_of_customer_ids")
             #customer_id_array = self.config.get("array_of_customer_ids").replace('[', '').replace(']', '').replace(' ', '').split(',')
             for i in customer_id_array:
-                yield {"customerClient": {"id": i}}
+                yield {"customerClient": {"id": str(i)}}
         else:
             for row in self.request_records(context):
                 row = self.post_process(row, context)
@@ -186,7 +186,19 @@ class ClickViewReportStream(ReportsStream):
 
     records_jsonpath = "$.results[*]"
     name = "stream_click_view_report"
-    primary_keys = ["click_view__gclid"]
+    primary_keys = [
+        "click_view__gclid",
+        "click_view__ad_group_ad",
+        "click_view__keyword",
+        "click_view__keyword_info__match_type",
+        "customer__id",
+        "ad_group__id",
+        "campaign__id",
+        "segments__device",
+        "segments__ad_network_type",
+        "segments__slot",
+        "segments__date"
+    ]
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "click_view_report.json"
 
