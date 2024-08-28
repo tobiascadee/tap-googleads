@@ -99,13 +99,18 @@ class CustomerHierarchyStream(GoogleAdsStream):
         Yields:
             One item per (possibly processed) record in the API.
         """
-
-        for row in self.request_records(context):
-            row = self.post_process(row, context)
-            # Don't search Manager accounts as we can't query them for everything
-            if row["customerClient"]["manager"] == True:
-                continue
-            yield row
+        if self.config.get("array_of_customer_ids", False):
+            customer_id_array = self.config.get("array_of_customer_ids")
+            #customer_id_array = self.config.get("array_of_customer_ids").replace('[', '').replace(']', '').replace(' ', '').split(',')
+            for i in customer_id_array:
+                yield {"customerClient": {"id": i}}
+        else:
+            for row in self.request_records(context):
+                row = self.post_process(row, context)
+                # Don't search Manager accounts as we can't query them for everything
+                if row["customerClient"]["manager"] == True:
+                    continue
+                yield row
 
     def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
         """Return a context dictionary for child streams."""

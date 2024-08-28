@@ -68,6 +68,11 @@ class TapGoogleAds(Tap):
             th.StringType,
             description="Value to use in the login-customer-id header, if different from the customer_id to sync. Useful if you are syncing using a manager account.",
         ),
+        th.Property(
+            "array_of_customer_ids",
+            th.ArrayType(th.IntegerType),
+            description="Overrides the taps default get all data for all available customers logic, and will get you the data for only the the provided customer_ids",
+        ),
     ).to_dict()
 
     def discover_streams(self) -> List[Stream]:
