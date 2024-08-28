@@ -1,0 +1,87 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "click_view": {
+            "type": "object",
+            "properties": {
+                "gclid": {
+                    "type": "string"
+                },
+                "ad_group_ad": {
+                    "type": "string"
+                },
+                "keyword": {
+                    "type": "string"
+                },
+                "keyword_info": {
+                    "type": "object",
+                    "properties": {
+                        "match_type": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "customer": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "ad_group": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "campaign": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "segments": {
+            "type": "object",
+            "properties": {
+                "ad_network_type": {
+                    "type": "string"
+                },
+                "device": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "slot": {
+                    "type": "string"
+                },
+                "click_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "metrics": {
+            "type": "object",
+            "properties": {
+                "clicks": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

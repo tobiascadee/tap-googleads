@@ -154,6 +154,36 @@ class ReportsStream(GoogleAdsStream):
         path = path + f"&query={self.gaql}"
         return path
 
+class ClickViewReportStream(ReportsStream):
+
+    @property
+    def gaql(self):
+        return f"""
+        SELECT
+            click_view.gclid
+            , customer.id
+            , click_view.ad_group_ad
+            , ad_group.id
+            , ad_group.name
+            , campaign.id
+            , campaign.name
+            , segments.ad_network_type
+            , segments.device
+            , segments.date
+            , segments.slot
+            , metrics.clicks
+            , segments.click_type
+            , click_view.keyword
+            , click_view.keyword_info.match_type
+        FROM click_view
+        WHERE segments.date = {self._end_date}
+        """
+
+    records_jsonpath = "$.results[*]"
+    name = "stream_click_view_report"
+    primary_keys = ["click_view__gclid"]
+    replication_key = None
+    schema_filepath = SCHEMAS_DIR / "click_view_report.json"
 
 class CampaignsStream(ReportsStream):
     """Define custom stream."""
