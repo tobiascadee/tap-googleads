@@ -2,22 +2,22 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
-        "click_view": {
+        "clickView": {
             "type": "object",
             "properties": {
                 "gclid": {
                     "type": "string"
                 },
-                "ad_group_ad": {
+                "adGroupAd": {
                     "type": "string"
                 },
                 "keyword": {
                     "type": "string"
                 },
-                "keyword_info": {
+                "keywordInfo": {
                     "type": "object",
                     "properties": {
-                        "match_type": {
+                        "matchType": {
                             "type": "string"
                         }
                     }
@@ -32,7 +32,7 @@
                 }
             }
         },
-        "ad_group": {
+        "adGroup": {
             "type": "object",
             "properties": {
                 "id": {
@@ -57,7 +57,7 @@
         "segments": {
             "type": "object",
             "properties": {
-                "ad_network_type": {
+                "adNetworkType": {
                     "type": "string"
                 },
                 "device": {
