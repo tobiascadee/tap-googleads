@@ -101,21 +101,8 @@ class CustomerHierarchyStream(GoogleAdsStream):
             One item per (possibly processed) record in the API.
         """
         if self.config.get("array_of_customer_ids", False):
-            customer_id_array = self.config.get("array_of_customer_ids")
-
-            date_list = []
-
-            current_date = datetime.strptime(self.start_date.replace("'", ""), "%Y-%m-%d")
-            while current_date < datetime.now() - timedelta(days=1):
-                date_list.append("'" + current_date.strftime("%Y-%m-%d") + "'")
-                current_date += timedelta(days=1)
-
-            for i in customer_id_array:
-                if len(date_list) > 0:
-                    for date in date_list:
-                        yield {"date": date, "customerClient": {"id": str(i)}}
-                else:
-                    yield {"date": current_date, "customerClient": {"id": str(i)}}
+            for i in self.config.get("array_of_customer_ids"):
+                yield {"customerClient": {"id": str(i)}}
         else:
             for row in self.request_records(context):
                 row = self.post_process(row, context)
@@ -126,7 +113,8 @@ class CustomerHierarchyStream(GoogleAdsStream):
 
     def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
         """Return a context dictionary for child streams."""
-        return {"customer_id": record["customerClient"]["id"], "date": record["date"]}
+        return {"customer_id": record["customerClient"]["id"]}
+
 
 
 class GeotargetsStream(GoogleAdsStream):
@@ -239,6 +227,20 @@ class ClickViewReportStream(ReportsStream):
             params["page"] = next_page_token
         return params
 
+    def get_records(self, context: Optional[dict]) -> Iterable[Dict[str, Any]]:
+        date_list = []
+
+        current_date = datetime.strptime(self.start_date.replace("'", ""), "%Y-%m-%d")
+        while current_date < datetime.now() - timedelta(days=1):
+            date_list.append("'" + current_date.strftime("%Y-%m-%d") + "'")
+            current_date += timedelta(days=1)
+
+        for date in date_list:
+            context['date'] = date
+
+            # Call the parent get_records with the modified context
+            for record in super().get_records(context):
+                yield record
 
 class CampaignsStream(ReportsStream):
     """Define custom stream."""
