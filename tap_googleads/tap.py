@@ -32,7 +32,6 @@ STREAM_TYPES = [
     CampaignPerformanceByLocation,
     GeotargetsStream,
     GeoPerformance,
-    ClickViewReportStream,
 ]
 
 
@@ -73,8 +72,16 @@ class TapGoogleAds(Tap):
             th.ArrayType(th.IntegerType),
             description="Overrides the taps default get all data for all available customers logic, and will get you the data for only the the provided customer_ids",
         ),
+        th.Property(
+            "enable_click_view_report_stream",
+            th.BooleanType,
+            description="Enables the tap's ClickViewReportStream. This requires setting up / permission on your google ads account(s)",
+        ),
     ).to_dict()
 
     def discover_streams(self) -> List[Stream]:
         """Return a list of discovered streams."""
+        if self.config.get("enable_click_view_report_stream"):
+            if self.config.get("enable_click_view_report_stream") == True:
+                STREAM_TYPES.append(ClickViewReportStream)
         return [stream_class(tap=self) for stream_class in STREAM_TYPES]
