@@ -56,6 +56,7 @@ class CustomerHierarchyStream(GoogleAdsStream):
 	SELECT
           customer_client.client_customer,
           customer_client.level,
+          customer_client.status,
           customer_client.manager,
           customer_client.descriptive_name,
           customer_client.currency_code,
@@ -77,6 +78,7 @@ class CustomerHierarchyStream(GoogleAdsStream):
                 th.Property("resourceName", th.StringType),
                 th.Property("clientCustomer", th.StringType),
                 th.Property("level", th.StringType),
+                th.Property("status", th.StringType),
                 th.Property("timeZone", th.StringType),
                 th.Property("manager", th.BooleanType),
                 th.Property("descriptiveName", th.StringType),
@@ -103,13 +105,13 @@ class CustomerHierarchyStream(GoogleAdsStream):
         for row in self.request_records(context):
             row = self.post_process(row, context)
             # Don't search Manager accounts as we can't query them for everything
-            if row["customerClient"]["manager"] == True:
+            if row["customerClient"]["manager"] or row["customerClient"]["status"] != "ENABLED":
                 continue
             yield row
 
     def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
         """Return a context dictionary for child streams."""
-        return {"customer_id": self.config.get("customer_id")}
+        return {"customer_id" : record["customerClient"]["id"]}
 
 
 class GeotargetsStream(GoogleAdsStream):
@@ -148,7 +150,7 @@ class ReportsStream(GoogleAdsStream):
     @property
     def path(self):
         # Paramas
-        path = f"/customers/{self.config.get('customer_id')}"
+        path = "/customers/{customer_id}"
         path = path + "/googleAds:search"
         path = path + "?pageSize=10000"
         path = path + f"&query={self.gaql}"
