@@ -200,6 +200,7 @@ class ClickViewReportStream(ReportsStream):
         "date"
     ]
     replication_key = "date"
+    replication_method = "INCREMENTAL"
     schema_filepath = SCHEMAS_DIR / "click_view_report.json"
 
     def post_process(self, row, context):
@@ -230,10 +231,41 @@ class ClickViewReportStream(ReportsStream):
     def get_records(self, context: Optional[dict]) -> Iterable[Dict[str, Any]]:
         date_list = []
 
+        replication_values = []
+
+        # Iterate through each partition in the list
+        for partition in self.stream_state["partitions"]:
+            # Check if the customer_id is "1111111111"
+            if partition["context"].get("customer_id") == context['customer_id']:
+                # Get the replication_key_value if it exists
+                replication_value = partition.get("replication_key_value")
+                if replication_value:
+                    replication_values.append(replication_value)
+
+        # Get the maximum replication_key_value
+        if len(replication_values) > 0:
+            last_replication_date = max(replication_values)
+        else:
+            last_replication_date = None
+
+        if last_replication_date:
+            if last_replication_date == datetime.now().strftime("%Y-%m-%d"):
+                yesterdays_date = datetime.now() - timedelta(days=1)
+                last_replication_date = yesterdays_date.strftime("%Y-%m-%d")
+
+            if 'T' in last_replication_date:
+                last_replication_date, _ = last_replication_date.split('T')
+
         current_date = datetime.strptime(self.start_date.replace("'", ""), "%Y-%m-%d")
+
+        if last_replication_date:
+            current_date = datetime.strptime(last_replication_date.replace("'", ""), "%Y-%m-%d")
+
         while current_date < datetime.now() - timedelta(days=1):
             date_list.append("'" + current_date.strftime("%Y-%m-%d") + "'")
             current_date += timedelta(days=1)
+        else:
+            date_list.append("'" + current_date.strftime("%Y-%m-%d") + "'")
 
         for date in date_list:
             context['date'] = date
