@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from typing import Any, Dict, Iterable, Optional
+from datetime import datetime, timedelta
 
 from singer_sdk import typing as th  # JSON Schema typing helpers
 
@@ -101,9 +102,20 @@ class CustomerHierarchyStream(GoogleAdsStream):
         """
         if self.config.get("array_of_customer_ids", False):
             customer_id_array = self.config.get("array_of_customer_ids")
-            #customer_id_array = self.config.get("array_of_customer_ids").replace('[', '').replace(']', '').replace(' ', '').split(',')
+
+            date_list = []
+
+            current_date = datetime.strptime(self.start_date.replace("'", ""), "%Y-%m-%d")
+            while current_date < datetime.now() - timedelta(days=1):
+                date_list.append("'" + current_date.strftime("%Y-%m-%d") + "'")
+                current_date += timedelta(days=1)
+
             for i in customer_id_array:
-                yield {"customerClient": {"id": str(i)}}
+                if len(date_list) > 0:
+                    for date in date_list:
+                        yield {"date": date, "customerClient": {"id": str(i)}}
+                else:
+                    yield {"date": current_date, "customerClient": {"id": str(i)}}
         else:
             for row in self.request_records(context):
                 row = self.post_process(row, context)
@@ -114,7 +126,7 @@ class CustomerHierarchyStream(GoogleAdsStream):
 
     def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
         """Return a context dictionary for child streams."""
-        return {"customer_id": record["customerClient"]["id"]}
+        return {"customer_id": record["customerClient"]["id"], "date": record["date"]}
 
 
 class GeotargetsStream(GoogleAdsStream):
@@ -163,7 +175,7 @@ class ClickViewReportStream(ReportsStream):
 
     @property
     def gaql(self):
-        return f"""
+        return """
         SELECT
             click_view.gclid
             , customer.id
@@ -181,7 +193,7 @@ class ClickViewReportStream(ReportsStream):
             , click_view.keyword
             , click_view.keyword_info.match_type
         FROM click_view
-        WHERE segments.date = {self._end_date}
+        WHERE segments.date = {date}
         """
 
     records_jsonpath = "$.results[*]"
@@ -197,10 +209,36 @@ class ClickViewReportStream(ReportsStream):
         "segments__device",
         "segments__ad_network_type",
         "segments__slot",
-        "segments__date"
+        "date"
     ]
-    replication_key = None
+    replication_key = "date"
     schema_filepath = SCHEMAS_DIR / "click_view_report.json"
+
+    def post_process(self, row, context):
+        row["date"] = row["segments"].pop("date")
+
+        if row.get("clickView", {}).get("keyword") == None:
+            row["clickView"]["keyword"] = 'null'
+            row["clickView"]["keywordInfo"] = {"matchType": "null"}
+
+        return row
+
+
+    def get_url_params(self, context, next_page_token):
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        if next_page_token:
+            params["page"] = next_page_token
+        return params
+
 
 class CampaignsStream(ReportsStream):
     """Define custom stream."""

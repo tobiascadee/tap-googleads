@@ -54,6 +54,10 @@
                 }
             }
         },
+        "date": {
+            "type": "string",
+            "format": "date"
+        },
         "segments": {
             "type": "object",
             "properties": {
@@ -63,14 +67,10 @@
                 "device": {
                     "type": "string"
                 },
-                "date": {
-                    "type": "string",
-                    "format": "date"
-                },
                 "slot": {
                     "type": "string"
                 },
-                "click_type": {
+                "clickType": {
                     "type": "string"
                 }
             }
