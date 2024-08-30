@@ -233,9 +233,9 @@ class ClickViewReportStream(ReportsStream):
 
         replication_values = []
 
-        # Iterate through each partition in the list
+        # Iterate through each partition in the state list
         for partition in self.stream_state["partitions"]:
-            # Check if the customer_id is "1111111111"
+            # Get context for customer id
             if partition["context"].get("customer_id") == context['customer_id']:
                 # Get the replication_key_value if it exists
                 replication_value = partition.get("replication_key_value")
@@ -248,11 +248,13 @@ class ClickViewReportStream(ReportsStream):
         else:
             last_replication_date = None
 
+        # if last_replication_date is today or greater, set the date to yesterday (last full days data)
         if last_replication_date:
-            if last_replication_date == datetime.now().strftime("%Y-%m-%d"):
+            if last_replication_date >= datetime.now().strftime("%Y-%m-%d"):
                 yesterdays_date = datetime.now() - timedelta(days=1)
                 last_replication_date = yesterdays_date.strftime("%Y-%m-%d")
 
+            # This is if the last_replication_date defaults back to the start date (timestamp)
             if 'T' in last_replication_date:
                 last_replication_date, _ = last_replication_date.split('T')
 
@@ -261,16 +263,17 @@ class ClickViewReportStream(ReportsStream):
         if last_replication_date:
             current_date = datetime.strptime(last_replication_date.replace("'", ""), "%Y-%m-%d")
 
-        while current_date < datetime.now() - timedelta(days=1):
-            date_list.append("'" + current_date.strftime("%Y-%m-%d") + "'")
-            current_date += timedelta(days=1)
+        # Generate a list of dates up to yesterday
+        if current_date < datetime.now() - timedelta(days=1):
+            while current_date < datetime.now() - timedelta(days=1):
+                date_list.append("'" + current_date.strftime("%Y-%m-%d") + "'")
+                current_date += timedelta(days=1)
         else:
-            date_list.append("'" + current_date.strftime("%Y-%m-%d") + "'")
+            date_list.append("'" + yesterdays_date.strftime("%Y-%m-%d") + "'")
 
         for date in date_list:
             context['date'] = date
-
-            # Call the parent get_records with the modified context
+            # Call the parent get_records with the modified context (date value)
             for record in super().get_records(context):
                 yield record
 
