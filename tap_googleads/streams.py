@@ -278,7 +278,7 @@ class ClickViewReportStream(ReportsStream):
             for record in super().get_records(context):
                 yield record
 
-    def sync(self, context: dict | None = None) -> None:
+    def sync(self, context):
         """Sync this stream.
 
         This method is internal to the SDK and should not need to be overridden.
