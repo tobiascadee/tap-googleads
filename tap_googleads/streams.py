@@ -100,8 +100,9 @@ class CustomerHierarchyStream(GoogleAdsStream):
         Yields:
             One item per (possibly processed) record in the API.
         """
-        if self.config.get("array_of_customer_ids", False):
-            for i in self.config.get("array_of_customer_ids"):
+        if self.config.get("comma_separated_string_of_customer_ids", False):
+            customer_ids_list = self.config.get("comma_separated_string_of_customer_ids").replace(" ", "").split(",")
+            for i in customer_ids_list:
                 yield {"customerClient": {"id": str(i)}}
         else:
             for row in self.request_records(context):

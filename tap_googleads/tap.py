@@ -68,8 +68,8 @@ class TapGoogleAds(Tap):
             description="Value to use in the login-customer-id header, if different from the customer_id to sync. Useful if you are syncing using a manager account.",
         ),
         th.Property(
-            "array_of_customer_ids",
-            th.ArrayType(th.IntegerType),
+            "comma_separated_string_of_customer_ids",
+            th.StringType,
             description="Overrides the taps default get all data for all available customers logic, and will get you the data for only the the provided customer_ids",
         ),
         th.Property(
