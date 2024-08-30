@@ -278,6 +278,57 @@ class ClickViewReportStream(ReportsStream):
             for record in super().get_records(context):
                 yield record
 
+    def sync(self, context: dict | None = None) -> None:
+        """Sync this stream.
+
+        This method is internal to the SDK and should not need to be overridden.
+
+        Args:
+            context: Stream partition or context dictionary.
+
+        Raises:
+            Exception: Any exception raised by the sync process.
+        """
+        msg = f"Beginning {self.replication_method.lower()} sync of '{self.name}'"
+        if context:
+            msg += f" with context: {context}"
+        self.logger.info("%s...", msg)
+
+        # Use a replication signpost, if available
+        signpost = self.get_replication_key_signpost(context)
+        if signpost:
+            self._write_replication_key_signpost(context, signpost)
+
+        # Send a SCHEMA message to the downstream target:
+        if self.selected:
+            self._write_schema_message()
+
+        try:
+            batch_config = self.get_batch_config(self.config)
+            if batch_config:
+                self._sync_batches(batch_config, context=context)
+            else:
+                # Sync the records themselves:
+                for _ in self._sync_records(context=context):
+                    pass
+        except Exception as ex:
+            if hasattr(ex, 'response') and ex.response is not None:
+                status_code = ex.response.status_code
+                if status_code not in [400, 403]:
+                    # Raise the exception if it's not 400 or 403
+                    self.logger.exception(
+                        "An unhandled error occurred while syncing '%s'",
+                        self.name,
+                    )
+                    raise ex
+            else:
+                # Log the 400 or 403 error and continue
+                self.logger.exception(
+                    "An unhandled error occurred while syncing '%s'",
+                    self.name,
+                )
+
+
 class CampaignsStream(ReportsStream):
     """Define custom stream."""
 
