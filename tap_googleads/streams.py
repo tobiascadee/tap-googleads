@@ -189,7 +189,6 @@ class ClickViewReportStream(ReportsStream):
     name = "stream_click_view_report"
     primary_keys = [
         "click_view__gclid",
-        "click_view__ad_group_ad",
         "click_view__keyword",
         "click_view__keyword_info__match_type",
         "customer__id",
