@@ -248,10 +248,11 @@ class ClickViewReportStream(ReportsStream):
         else:
             last_replication_date = None
 
+        yesterdays_date = datetime.now() - timedelta(days=1)
+
         # if last_replication_date is today or greater, set the date to yesterday (last full days data)
         if last_replication_date:
             if last_replication_date >= datetime.now().strftime("%Y-%m-%d"):
-                yesterdays_date = datetime.now() - timedelta(days=1)
                 last_replication_date = yesterdays_date.strftime("%Y-%m-%d")
 
             # This is if the last_replication_date defaults back to the start date (timestamp)
