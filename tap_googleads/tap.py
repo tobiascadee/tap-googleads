@@ -17,6 +17,7 @@ from tap_googleads.streams import (
     CustomerHierarchyStream,
     GeoPerformance,
     GeotargetsStream,
+    ClickViewReportStream,
 )
 
 STREAM_TYPES = [
@@ -66,8 +67,21 @@ class TapGoogleAds(Tap):
             th.StringType,
             description="Value to use in the login-customer-id header, if different from the customer_id to sync. Useful if you are syncing using a manager account.",
         ),
+        th.Property(
+            "comma_separated_string_of_customer_ids",
+            th.StringType,
+            description="Overrides the taps default get all data for all available customers logic, and will get you the data for only the the provided customer_ids",
+        ),
+        th.Property(
+            "enable_click_view_report_stream",
+            th.BooleanType,
+            description="Enables the tap's ClickViewReportStream. This requires setting up / permission on your google ads account(s)",
+        ),
     ).to_dict()
 
     def discover_streams(self) -> List[Stream]:
         """Return a list of discovered streams."""
+        if self.config.get("enable_click_view_report_stream"):
+            if self.config.get("enable_click_view_report_stream") == True:
+                STREAM_TYPES.append(ClickViewReportStream)
         return [stream_class(tap=self) for stream_class in STREAM_TYPES]
