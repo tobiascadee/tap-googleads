@@ -200,8 +200,8 @@ class ClickViewReportStream(ReportsStream):
         "date"
     ]
     replication_key = "date"
-    replication_method = "INCREMENTAL"
     schema_filepath = SCHEMAS_DIR / "click_view_report.json"
+    state_partitioning_keys = []
 
     def post_process(self, row, context):
         row["date"] = row["segments"].pop("date")
@@ -233,14 +233,9 @@ class ClickViewReportStream(ReportsStream):
 
         replication_values = []
 
-        # Iterate through each partition in the state list
-        for partition in self.stream_state["partitions"]:
-            # Get context for customer id
-            if partition["context"].get("customer_id") == context['customer_id']:
-                # Get the replication_key_value if it exists
-                replication_value = partition.get("replication_key_value")
-                if replication_value:
-                    replication_values.append(replication_value)
+        value = self.stream_state.get("replication_key_value", False)
+        if value:
+            replication_values.append(value)
 
         # Get the maximum replication_key_value
         if len(replication_values) > 0:
@@ -293,11 +288,6 @@ class ClickViewReportStream(ReportsStream):
         if context:
             msg += f" with context: {context}"
         self.logger.info("%s...", msg)
-
-        # Use a replication signpost, if available
-        signpost = self.get_replication_key_signpost(context)
-        if signpost:
-            self._write_replication_key_signpost(context, signpost)
 
         # Send a SCHEMA message to the downstream target:
         if self.selected:
