@@ -68,7 +68,7 @@ class CustomerHierarchyStream(GoogleAdsStream):
 
     records_jsonpath = "$.results[*]"
     name = "stream_customer_hierarchy"
-    primary_keys = ["customer_client__id"]
+    primary_keys = ["customerClient__id"]
     replication_key = None
     parent_stream_type = AccessibleCustomers
     schema = th.PropertiesList(
@@ -188,14 +188,14 @@ class ClickViewReportStream(ReportsStream):
     records_jsonpath = "$.results[*]"
     name = "stream_click_view_report"
     primary_keys = [
-        "click_view__gclid",
-        "click_view__keyword",
-        "click_view__keyword_info__match_type",
+        "clickView__gclid",
+        "clickView__keyword",
+        "clickView__keywordInfo__matchType",
         "customer__id",
-        "ad_group__id",
+        "adGroup__id",
         "campaign__id",
         "segments__device",
-        "segments__ad_network_type",
+        "segments__adNetworkType",
         "segments__slot",
         "date"
     ]
