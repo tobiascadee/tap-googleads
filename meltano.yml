@@ -65,6 +65,9 @@ plugins:
       kind: hidden
       label: Optional - OAuth Refresh Proxy URL Auth is the authentication your proxy refresh server
       required: false
+    select:
+    - stream_campaign.*
+    - stream_campaign_performance.*
   loaders:
   - name: target-jsonl
     variant: andyh1203

@@ -5,6 +5,7 @@ from typing import Any, Dict, Iterable, Optional
 from datetime import datetime, timedelta
 
 from singer_sdk import typing as th  # JSON Schema typing helpers
+from singer_sdk.helpers.types import Record, Context
 
 from tap_googleads.client import GoogleAdsStream
 
@@ -25,9 +26,26 @@ class AccessibleCustomers(GoogleAdsStream):
         th.Property("resourceNames", th.ArrayType(th.StringType))
     ).to_dict()
 
+    def generate_child_contexts(
+        self,
+        record: Record,
+        context: Context | None,
+    ) -> Iterable[Context | None]:
+        """Generate child contexts.
+
+        Args:
+            record: Individual record in the stream.
+            context: Stream partition or context dictionary.
+
+        Yields:
+            A child context for each child stream.
+        """
+        self.logger.info(context)
+        yield self.get_child_context(record=record, context=context)
+
     def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
         """Return a context dictionary for child streams."""
-        return {"resourceNames": ["customers/" + self.config.get('customer_id')]}
+        return {"resourceNames": ["customers/" + self.config.get("customer_id")]}
 
 
 class CustomerHierarchyStream(GoogleAdsStream):
@@ -57,6 +75,7 @@ class CustomerHierarchyStream(GoogleAdsStream):
 	SELECT
           customer_client.client_customer,
           customer_client.level,
+          customer_client.status,
           customer_client.manager,
           customer_client.descriptive_name,
           customer_client.currency_code,
@@ -78,6 +97,7 @@ class CustomerHierarchyStream(GoogleAdsStream):
                 th.Property("resourceName", th.StringType),
                 th.Property("clientCustomer", th.StringType),
                 th.Property("level", th.StringType),
+                th.Property("status", th.StringType),
                 th.Property("timeZone", th.StringType),
                 th.Property("manager", th.BooleanType),
                 th.Property("descriptiveName", th.StringType),
@@ -101,21 +121,27 @@ class CustomerHierarchyStream(GoogleAdsStream):
             One item per (possibly processed) record in the API.
         """
         if self.config.get("comma_separated_string_of_customer_ids", False):
-            customer_ids_list = self.config.get("comma_separated_string_of_customer_ids").replace(" ", "").split(",")
+            customer_ids_list = (
+                self.config.get("comma_separated_string_of_customer_ids")
+                .replace(" ", "")
+                .split(",")
+            )
             for i in customer_ids_list:
                 yield {"customerClient": {"id": str(i)}}
         else:
             for row in self.request_records(context):
                 row = self.post_process(row, context)
                 # Don't search Manager accounts as we can't query them for everything
-                if row["customerClient"]["manager"] == True:
+                if (
+                    row["customerClient"]["manager"]
+                    or row["customerClient"]["status"] != "ENABLED"
+                ):
                     continue
                 yield row
 
     def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
         """Return a context dictionary for child streams."""
         return {"customer_id": record["customerClient"]["id"]}
-
 
 
 class GeotargetsStream(GoogleAdsStream):
@@ -160,8 +186,8 @@ class ReportsStream(GoogleAdsStream):
         path = path + f"&query={self.gaql}"
         return path
 
-class ClickViewReportStream(ReportsStream):
 
+class ClickViewReportStream(ReportsStream):
     @property
     def gaql(self):
         return """
@@ -197,7 +223,7 @@ class ClickViewReportStream(ReportsStream):
         "segments__device",
         "segments__adNetworkType",
         "segments__slot",
-        "date"
+        "date",
     ]
     replication_key = "date"
     schema_filepath = SCHEMAS_DIR / "click_view_report.json"
@@ -207,11 +233,10 @@ class ClickViewReportStream(ReportsStream):
         row["date"] = row["segments"].pop("date")
 
         if row.get("clickView", {}).get("keyword") == None:
-            row["clickView"]["keyword"] = 'null'
+            row["clickView"]["keyword"] = "null"
             row["clickView"]["keywordInfo"] = {"matchType": "null"}
 
         return row
-
 
     def get_url_params(self, context, next_page_token):
         """Return a dictionary of values to be used in URL parameterization.
@@ -251,13 +276,15 @@ class ClickViewReportStream(ReportsStream):
                 last_replication_date = yesterdays_date.strftime("%Y-%m-%d")
 
             # This is if the last_replication_date defaults back to the start date (timestamp)
-            if 'T' in last_replication_date:
-                last_replication_date, _ = last_replication_date.split('T')
+            if "T" in last_replication_date:
+                last_replication_date, _ = last_replication_date.split("T")
 
         current_date = datetime.strptime(self.start_date.replace("'", ""), "%Y-%m-%d")
 
         if last_replication_date:
-            current_date = datetime.strptime(last_replication_date.replace("'", ""), "%Y-%m-%d")
+            current_date = datetime.strptime(
+                last_replication_date.replace("'", ""), "%Y-%m-%d"
+            )
 
         # Generate a list of dates up to yesterday
         if current_date < datetime.now() - timedelta(days=1):
@@ -268,7 +295,7 @@ class ClickViewReportStream(ReportsStream):
             date_list.append("'" + yesterdays_date.strftime("%Y-%m-%d") + "'")
 
         for date in date_list:
-            context['date'] = date
+            context["date"] = date
             # Call the parent get_records with the modified context (date value)
             for record in super().get_records(context):
                 yield record
@@ -302,7 +329,7 @@ class ClickViewReportStream(ReportsStream):
                 for _ in self._sync_records(context=context):
                     pass
         except Exception as ex:
-            if hasattr(ex, 'response') and ex.response is not None:
+            if hasattr(ex, "response") and ex.response is not None:
                 status_code = ex.response.status_code
                 if status_code not in [400, 403]:
                     # Raise the exception if it's not 400 or 403
