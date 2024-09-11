@@ -7,8 +7,8 @@ import requests
 from dateutil import parser
 from memoization import cached
 from singer_sdk.authenticators import OAuthAuthenticator
-from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
+from singer_sdk.pagination import BaseAPIPaginator
 
 from tap_googleads.auth import GoogleAdsAuthenticator, ProxyGoogleAdsAuthenticator
 
@@ -78,23 +78,8 @@ class GoogleAdsStream(RESTStream):
         headers["login-customer-id"] = self.config.get("login_customer_id")
         return headers
 
-    def get_next_page_token(
-        self, response: requests.Response, previous_token: Optional[Any]
-    ) -> Optional[Any]:
-        """Return a token for identifying next page or None if no more pages."""
-        # TODO: If pagination is required, return a token which can be used to get the
-        #       next page. If this is the final page, return "None" to end the
-        #       pagination loop.
-        if self.next_page_token_jsonpath:
-            all_matches = extract_jsonpath(
-                self.next_page_token_jsonpath, response.json()
-            )
-            first_match = next(iter(all_matches), None)
-            next_page_token = first_match
-        else:
-            next_page_token = None
-
-        return next_page_token
+    def get_new_paginator(self) -> BaseAPIPaginator:
+        return GoogleAdsPaginator(None)
 
     def get_url_params(
         self, context: Optional[dict], next_page_token: Optional[Any]
@@ -123,3 +108,18 @@ class GoogleAdsStream(RESTStream):
             date = parser.parse(self.config.get("end_date"))
             date = "'" + date.strftime("%Y-%m-%d") + "'"
         return date or self._end_date
+
+
+class GoogleAdsPaginator(BaseAPIPaginator):
+    def get_next(self, response: requests.Response) -> str | None:
+        """Get the next pagination token or index from the API response.
+
+        Args:
+            response: API response object.
+
+        Returns:
+            The next page token or index. Return `None` from this method to indicate
+                the end of pagination.
+        """
+        data = response.json()
+        return data.get("nextPageToken")
