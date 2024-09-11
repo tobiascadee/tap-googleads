@@ -45,20 +45,17 @@ class TapGoogleAds(Tap):
         th.Property(
             "oauth_credentials.client_id",
             th.StringType,
-            required=True,
             secret=True,
         ),
         th.Property(
             "oauth_credentials.client_secret",
             th.StringType,
-            required=True,
             secret=True,
         ),
-        th.Property("developer_token", th.StringType, required=True, secret=True),
+        th.Property("developer_token", th.StringType, secret=True),
         th.Property(
             "oauth_credentials.refresh_token",
             th.StringType,
-            required=True,
             secret=True,
         ),
         th.Property(
