@@ -1,19 +1,239 @@
 {
     "type": "object",
     "properties": {
-                "customer_id": {
-                    "type": "string"
-                },
+        "customer_id": {
+            "type": "string"
+        },
         "campaign": {
+            "type": "object",
+            "properties": {
+                "resourceName": {
+                    "type": "string",
+                    "description": "Immutable. The resource name of the campaign. Campaign resource names have the form:customers/{customer_id}/campaigns/{campaign_id}"
+                },
+                "primaryStatus": {
+                    "type": "string",
+                    "description": "Output only. The primary status of the campaign.Provides insight into why a campaign is not serving or not serving optimally. Modification to the campaign and its related entities might take a while to be reflected in this status."
+                },
+                "primaryStatusReasons": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Output only. The primary status reasons of the campaign.Provides insight into why a campaign is not serving or not serving optimally. These reasons are aggregated to determine an overall CampaignPrimaryStatus."
+                },
+                "status": {
+                    "type": "string",
+                    "description": "The status of the campaign.When a new campaign is added, the status defaults to ENABLED."
+                },
+                "servingStatus": {
+                    "type": "string",
+                    "description": "Output only. The ad serving status of the campaign."
+                },
+                "biddingStrategySystemStatus": {
+                    "type": "string",
+                    "description": "Output only. The system status of the campaign's bidding strategy."
+                },
+                "adServingOptimizationStatus": {
+                    "type": "string",
+                    "description": "The ad serving optimization status of the campaign."
+                },
+                "advertisingChannelType": {
+                    "type": "string",
+                    "description": "Immutable. The primary serving target for ads within the campaign. The targeting options can be refined in network_settings.This field is required and should not be empty when creating new campaigns.Can be set only when creating campaigns. After the campaign is created, the field can not be changed."
+                },
+                "advertisingChannelSubType": {
+                    "type": "string",
+                    "description": "Immutable. Optional refinement to advertising_channel_type. Must be a valid sub-type of the parent channel type.Can be set only when creating campaigns. After campaign is created, the field can not be changed."
+                },
+                "urlCustomParameters": {
+                    "type": "string",
+                    "description": "The list of mappings used to substitute custom parameter tags in a tracking_url_template, final_urls, or mobile_final_urls."
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Output only. The resource names of labels attached to this campaign."
+                },
+                "experimentType": {
+                    "type": "string",
+                    "description": "Output only. The type of campaign: normal, draft, or experiment."
+                },
+                "biddingStrategyType": {
+                    "type": "string",
+                    "description": "Output only. The type of bidding strategy.A bidding strategy can be created by setting either the bidding scheme to create a standard bidding strategy or the bidding_strategy field to create a portfolio bidding strategy.This field is read-only."
+                },
+                "accessibleBiddingStrategy": {
+                    "type": "string",
+                    "description": "Output only. Resource name of AccessibleBiddingStrategy, a read-only view of the unrestricted attributes of the attached portfolio bidding strategy identified by 'bidding_strategy'. Empty, if the campaign does not use a portfolio strategy. Unrestricted strategy attributes are available to all customers with whom the strategy is shared and are read from the AccessibleBiddingStrategy resource. In contrast, restricted attributes are only available to the owner customer of the strategy and their managers. Restricted attributes can only be read from the BiddingStrategy resource."
+                },
+                "frequencyCaps": {
+                    "type": "array",
+                    "items": {
+                        "key": {
+                            "type": "object",
+                            "properties": {
+                                "level": {
+                                    "type": "string"
+                                },
+                                "event_type": {
+                                    "type": "string"
+                                },
+                                "time_unit": {
+                                    "type": "string"
+                                },
+                                "time_length": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "cap": {
+                            "type": "string"
+                        }
+                    },
+                    "description": "A list that limits how often each user will see this campaign's ads."
+                },
+                "videoBrandSafetySuitability": {
+                    "type": "string",
+                    "description": "Brand Safety setting at the individual campaign level. Allows for selecting an inventory type to show your ads on content that is the right fit for your brand. See https://support.google.com/google-ads/answer/7515513."
+                },
+                "paymentMode": {
+                    "type": "string",
+                    "description": "Payment mode for the campaign."
+                },
+                "excludedParentAssetFieldTypes": {
+                    "type": "string",
+                    "description": "The asset field types that should be excluded from this campaign. Asset links with these field types will not be inherited by this campaign from the upper level."
+                },
+                "excludedParentAssetSetTypes": {
+                    "type": "string",
+                    "description": "The asset set types that should be excluded from this campaign. Asset set links with these types will not be inherited by this campaign from the upper level. Location group types (GMB_DYNAMIC_LOCATION_GROUP, CHAIN_DYNAMIC_LOCATION_GROUP, and STATIC_LOCATION_GROUP) are child types of LOCATION_SYNC. Therefore, if LOCATION_SYNC is set for this field, all location group asset sets are not allowed to be linked to this campaign, and all Location Extension (LE) and Affiliate Location Extensions (ALE) will not be served under this campaign. Only LOCATION_SYNC is currently supported."
+                },
+                "assetAutomationSettings": {
+                    "type": "array",
+                    "items": {
+                        "asset_automation_type": {
+                            "description": "The asset automation type advertiser would like to opt-in/out.",
+                            "type": "string"
+                        },
+                        "asset_automation_status": {
+                            "description": "The opt-in/out status of asset automation type.",
+                            "type": "string"
+                        }
+                    },
+                    "description": "Contains the opt-in/out status of each AssetAutomationType. See documentation of each asset automation type enum for default opt in/out behavior."
+                },
+                "id": {
+                    "type": "string",
+                    "description": "Output only. The ID of the campaign."
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The name of the campaign.This field is required and should not be empty when creating new campaigns.It must not contain any null (code point 0x0), NL line feed (code point 0xA) or carriage return (code point 0xD) characters."
+                },
+                "trackingUrlTemplate": {
+                    "type": "string",
+                    "description": "The URL template for constructing a tracking URL."
+                },
+                "baseCampaign": {
+                    "type": "string",
+                    "description": "Output only. The resource name of the base campaign of a draft or experiment campaign. For base campaigns, this is equal to resource_name.This field is read-only."
+                },
+                "campaignBudget": {
+                    "type": "string",
+                    "description": "The budget of the campaign."
+                },
+                "startDate": {
+                    "string_format": "date",
+                    "description": "The date when campaign started in serving customer's timezone in YYYY-MM-DD format."
+                },
+                "campaignGroup": {
+                    "type": "string",
+                    "description": "The campaign group this campaign belongs to."
+                },
+                "endDate": {
+                    "string_format": "date",
+                    "description": "The last day of the campaign in serving customer's timezone in YYYY-MM-DD format. On create, defaults to 2037-12-30, which means the campaign will run indefinitely. To set an existing campaign to run indefinitely, set this field to 2037-12-30."
+                },
+                "finalUrlSuffix": {
+                    "type": "string",
+                    "description": "Suffix used to append query parameters to landing pages that are served with parallel tracking."
+                },
+                "optimizationScore": {
+                    "type": "number",
+                    "description": "Output only. Optimization score of the campaign.Optimization score is an estimate of how well a campaign is set to perform. It ranges from 0% (0.0) to 100% (1.0), with 100% indicating that the campaign is performing at full potential. This field is null for unscored campaigns.See \"About optimization score\" at https://support.google.com/google-ads/answer/9061546.This field is read-only."
+                },
+                "urlExpansionOptOut": {
+                    "type": "boolean",
+                    "description": "Represents opting out of URL expansion to more targeted URLs. If opted out (true), only the final URLs in the asset group or URLs specified in the advertiser's Google Merchant Center or business data feeds are targeted. If opted in (false), the entire domain will be targeted. This field can only be set for Performance Max campaigns, where the default value is false."
+                },
+                "hotelPropertyAssetSet": {
+                    "type": "string",
+                    "description": "Immutable. The set of hotel properties for Performance Max for travel goals campaigns."
+                },
+                "listingType": {
+                    "type": "string",
+                    "description": "Immutable. Listing type of ads served for this campaign. Field is restricted for usage with Performance Max campaigns."
+                }
+            }
+        },
+        "campaignBudget": {
             "type": "object",
             "properties": {
                 "resourceName": {
                     "type": "string"
                 },
-                "name": {
+                "status": {
+                    "type": "string"
+                },
+                "deliveryMethod": {
+                    "type": "string"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "alignedBiddingStrategyId": {
                     "type": "string"
                 },
                 "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "amountMicros": {
+                    "type": "string"
+                },
+                "totalAmountMicros": {
+                    "type": "string"
+                },
+                "explicitlyShared": {
+                    "type": "boolean"
+                },
+                "referenceCount": {
+                    "type": "string"
+                },
+                "hasRecommendedBudget": {
+                    "type": "boolean"
+                },
+                "recommendedBudgetAmountMicros": {
+                    "type": "string"
+                },
+                "recommendedBudgetEstimatedChangeWeeklyClicks": {
+                    "type": "string"
+                },
+                "recommendedBudgetEstimatedChangeWeeklyCost_micros": {
+                    "type": "string"
+                },
+                "recommendedBudgetEstimatedChangeWeeklyInteractions": {
+                    "type": "string"
+                },
+                "recommendedBudgetEstimatedChangeWeeklyViews": {
                     "type": "string"
                 }
             }

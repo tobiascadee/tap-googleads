@@ -1,7 +1,10 @@
 """REST client handling, including GoogleAdsStream base class."""
 
+from __future__ import annotations
+
 from datetime import datetime, timedelta
 from typing import Any, Dict, Optional
+import re
 
 import requests
 from dateutil import parser
@@ -108,6 +111,9 @@ class GoogleAdsStream(RESTStream):
             date = parser.parse(self.config.get("end_date"))
             date = "'" + date.strftime("%Y-%m-%d") + "'"
         return date or self._end_date
+
+    def _camel_case_to_snake_case(self, camel_case_word: str) -> str:
+        return re.sub(r"(?<!^)(?=[A-Z])", "_", camel_case_word).lower()
 
 
 class GoogleAdsPaginator(BaseAPIPaginator):

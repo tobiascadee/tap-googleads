@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, Optional
 from datetime import datetime, timedelta
 
+from requests.models import Response as Response
 from singer_sdk import typing as th  # JSON Schema typing helpers
 from singer_sdk.helpers.types import Record, Context
 
@@ -344,10 +345,22 @@ class CampaignsStream(ReportsStream):
     """Define custom stream."""
 
     @property
-    def gaql(self):
-        return """
-        SELECT campaign.id, campaign.name FROM campaign ORDER BY campaign.id
+    def gaql(self) -> str:
+        """Create gaql statement for request.
+
+        Returns
+        -------
+        str
+            gaql statement.
+
         """
+        properties = [
+            f"{self._camel_case_to_snake_case(key)}.{self._camel_case_to_snake_case(prop)}"
+            for key, value in self.schema["properties"].items()
+            if key != "customer_id"
+            for prop in value["properties"]
+        ]
+        return f"SELECT {', '.join(properties)} FROM campaign"  # noqa: S608
 
     records_jsonpath = "$.results[*]"
     name = "stream_campaign"
