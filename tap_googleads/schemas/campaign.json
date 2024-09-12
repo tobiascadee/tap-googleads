@@ -4,6 +4,9 @@
         "customer_id": {
             "type": "string"
         },
+        "id": {
+            "type": "string"
+        },
         "campaign": {
             "type": "object",
             "properties": {
@@ -146,6 +149,7 @@
                     "description": "The budget of the campaign."
                 },
                 "startDate": {
+                    "type": "string",
                     "string_format": "date",
                     "description": "The date when campaign started in serving customer's timezone in YYYY-MM-DD format."
                 },
@@ -154,6 +158,7 @@
                     "description": "The campaign group this campaign belongs to."
                 },
                 "endDate": {
+                    "type": "string",
                     "string_format": "date",
                     "description": "The last day of the campaign in serving customer's timezone in YYYY-MM-DD format. On create, defaults to 2037-12-30, which means the campaign will run indefinitely. To set an existing campaign to run indefinitely, set this field to 2037-12-30."
                 },

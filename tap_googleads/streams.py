@@ -1,5 +1,7 @@
 """Stream type classes for tap-googleads."""
 
+from __future__ import annotations
+
 from pathlib import Path
 from typing import Any, Dict, Iterable, Optional
 from datetime import datetime, timedelta
@@ -357,14 +359,40 @@ class CampaignsStream(ReportsStream):
         properties = [
             f"{self._camel_case_to_snake_case(key)}.{self._camel_case_to_snake_case(prop)}"
             for key, value in self.schema["properties"].items()
-            if key != "customer_id"
+            if key not in ["id", "customer_id"]
             for prop in value["properties"]
         ]
         return f"SELECT {', '.join(properties)} FROM campaign"  # noqa: S608
 
+    def post_process(
+        self,
+        row: Record,
+        context: Context | None = None,  # noqa: ARG002
+    ) -> dict | None:
+        """As needed, append or transform raw data to match expected structure.
+
+        Optional. This method gives developers an opportunity to "clean up" the results
+        prior to returning records to the downstream tap - for instance: cleaning,
+        renaming, or appending properties to the raw record result returned from the
+        API.
+
+        Developers may also return `None` from this method to filter out
+        invalid or not-applicable records from the stream.
+
+        Args:
+            row: Individual record in the stream.
+            context: Stream partition or context dictionary.
+
+        Returns:
+            The resulting record dict, or `None` if the record should be excluded.
+
+        """
+        row["id"] = row["campaign"]["id"]
+        return row
+
     records_jsonpath = "$.results[*]"
     name = "stream_campaign"
-    primary_keys = ["campaign__id"]
+    primary_keys = ["id"]
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "campaign.json"
 
