@@ -1,38 +1,57 @@
 """Stream type classes for tap-googleads."""
 
-from pathlib import Path
-from typing import Any, Dict, Iterable, Optional
+from __future__ import annotations
+
 from datetime import datetime, timedelta
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Dict, Iterable, Optional
 
 from singer_sdk import typing as th  # JSON Schema typing helpers
 
 from tap_googleads.client import GoogleAdsStream
 
-# TODO: Delete this is if not using json files for schema definition
+if TYPE_CHECKING:
+    from singer_sdk.helpers.types import Context, Record
+
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
-# TODO: - Override `UsersStream` and `GroupsStream` with your own stream definition.
-#       - Copy-paste as many times as needed to create multiple stream types.
 
 
 class AccessibleCustomers(GoogleAdsStream):
-    """Accessible Customers"""
+    """Accessible Customers."""
 
+    rest_method = "GET"
     path = "/customers:listAccessibleCustomers"
     name = "stream_accessible_customers"
     primary_keys = ["resource_names"]
     replication_key = None
     schema = th.PropertiesList(
-        th.Property("resourceNames", th.ArrayType(th.StringType))
+        th.Property("resourceNames", th.ArrayType(th.StringType)),
     ).to_dict()
 
-    def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
-        """Return a context dictionary for child streams."""
-        return {"resourceNames": ["customers/" + self.config.get('customer_id')]}
+    def generate_child_contexts(
+        self,
+        record: Record,
+        context: Context | None,
+    ) -> Iterable[Context | None]:
+        """Generate child contexts.
+
+        Args:
+            record: Individual record in the stream.
+            context: Stream partition or context dictionary.
+
+        Yields:
+            A child context for each child stream.
+
+        """
+        for customer in record.get("resourceNames", []):
+            customer_id = customer.split("/")[1]
+            yield {"customer_id": customer_id}
 
 
 class CustomerHierarchyStream(GoogleAdsStream):
-    """
-    Customer Hierarchy, inspiration from Google here
+    """Customer Hierarchy.
+
+    Inspiration from Google here
     https://developers.google.com/google-ads/api/docs/account-management/get-account-hierarchy.
 
     This stream is stictly to be the Parent Stream, to let all Child Streams
@@ -40,23 +59,13 @@ class CustomerHierarchyStream(GoogleAdsStream):
 
     """
 
-    rest_method = "POST"
-
-    @property
-    def path(self):
-        # Paramas
-        path = f"/customers/{self.config.get('customer_id')}"
-        path = path + "/googleAds:search"
-        path = path + "?pageSize=10000"
-        path = path + f"&query={self.gaql}"
-        return path
-
     @property
     def gaql(self):
         return """
 	SELECT
           customer_client.client_customer,
           customer_client.level,
+          customer_client.status,
           customer_client.manager,
           customer_client.descriptive_name,
           customer_client.currency_code,
@@ -78,90 +87,104 @@ class CustomerHierarchyStream(GoogleAdsStream):
                 th.Property("resourceName", th.StringType),
                 th.Property("clientCustomer", th.StringType),
                 th.Property("level", th.StringType),
+                th.Property("status", th.StringType),
                 th.Property("timeZone", th.StringType),
                 th.Property("manager", th.BooleanType),
                 th.Property("descriptiveName", th.StringType),
                 th.Property("currencyCode", th.StringType),
                 th.Property("id", th.StringType),
             ),
-        )
+        ),
     ).to_dict()
 
-    # Goal of this stream is to send to children stream a dict of
-    # login-customer-id:customer-id to query for all queries downstream
-    def get_records(self, context: Optional[dict]) -> Iterable[Dict[str, Any]]:
-        """Return a generator of row-type dictionary objects.
+    def post_process(
+        self,
+        row: Record,
+        context: Context | None = None,  # noqa: ARG002
+    ) -> dict | None:
+        """As needed, append or transform raw data to match expected structure.
 
-        Each row emitted should be a dictionary of property names to their values.
+        Optional. This method gives developers an opportunity to "clean up" the results
+        prior to returning records to the downstream tap - for instance: cleaning,
+        renaming, or appending properties to the raw record result returned from the
+        API.
+
+        Developers may also return `None` from this method to filter out
+        invalid or not-applicable records from the stream.
 
         Args:
+            row: Individual record in the stream.
             context: Stream partition or context dictionary.
 
-        Yields:
-            One item per (possibly processed) record in the API.
-        """
-        if self.config.get("comma_separated_string_of_customer_ids", False):
-            customer_ids_list = self.config.get("comma_separated_string_of_customer_ids").replace(" ", "").split(",")
-            for i in customer_ids_list:
-                yield {"customerClient": {"id": str(i)}}
-        else:
-            for row in self.request_records(context):
-                row = self.post_process(row, context)
-                # Don't search Manager accounts as we can't query them for everything
-                if row["customerClient"]["manager"] == True:
-                    continue
-                yield row
+        Returns:
+            The resulting record dict, or `None` if the record should be excluded.
 
-    def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
+        """
+        customer = row["customerClient"]
+
+        if (
+            self.config.get("customer_ids")
+            and customer["id"] not in self.config["customer_ids"]
+        ):
+            return None
+
+        if customer["manager"]:
+            self.logger.warning("%s is a manager, skipping", customer["clientCustomer"])
+            return None
+
+        if customer["status"] != "ENABLED":
+            self.logger.warning(
+                "%s is not enabled, skipping",
+                customer["clientCustomer"],
+            )
+            return None
+
+        return row
+
+    def get_child_context(self, record: dict, context: dict | None) -> dict:  # noqa: ARG002
         """Return a context dictionary for child streams."""
         return {"customer_id": record["customerClient"]["id"]}
 
 
+class ReportsStream(GoogleAdsStream):
+    parent_stream_type = CustomerHierarchyStream
 
-class GeotargetsStream(GoogleAdsStream):
+class GeotargetsStream(ReportsStream):
     """Geotargets, worldwide, constant across all customers"""
 
-    rest_method = "POST"
-
-    @property
-    def path(self):
-        # Paramas
-        path = f"/customers/{self.config.get('customer_id')}"
-        path = path + "/googleAds:search"
-        path = path + "?pageSize=10000"
-        path = path + f"&query={self.gaql}"
-        return path
-
     gaql = """
-    SELECT geo_target_constant.canonical_name, geo_target_constant.country_code, geo_target_constant.id, geo_target_constant.name, geo_target_constant.status, geo_target_constant.target_type FROM geo_target_constant
+    SELECT 
+        geo_target_constant.canonical_name,
+        geo_target_constant.country_code,
+        geo_target_constant.id,
+        geo_target_constant.name,
+        geo_target_constant.status,
+        geo_target_constant.target_type
+    FROM geo_target_constant
     """
     records_jsonpath = "$.results[*]"
     name = "stream_geo_target_constant"
     primary_keys = ["geo_target_constant__id"]
     replication_key = None
     schema_filepath = SCHEMAS_DIR / "geo_target_constant.json"
-    parent_stream_type = None  # Override ReportsStream default as this is a constant
 
+    def get_records(self, context: Context) -> Iterable[Dict[str, Any]]:
+        """Return a generator of record-type dictionary objects.
 
-class ReportsStream(GoogleAdsStream):
-    rest_method = "POST"
-    parent_stream_type = CustomerHierarchyStream
+        Each record emitted should be a dictionary of property names to their values.
 
-    @property
-    def gaql(self):
-        raise NotImplementedError
+        Args:
+            context: Stream partition or context dictionary.
 
-    @property
-    def path(self):
-        # Paramas
-        path = "/customers/{customer_id}"
-        path = path + "/googleAds:search"
-        path = path + "?pageSize=10000"
-        path = path + f"&query={self.gaql}"
-        return path
+        Yields:
+            One item per (possibly processed) record in the API.
+
+        """
+        yield from super().get_records(context)
+        self.selected = False  # sync once only
+
 
 class ClickViewReportStream(ReportsStream):
-
     @property
     def gaql(self):
         return """
@@ -197,7 +220,7 @@ class ClickViewReportStream(ReportsStream):
         "segments__device",
         "segments__adNetworkType",
         "segments__slot",
-        "date"
+        "date",
     ]
     replication_key = "date"
     schema_filepath = SCHEMAS_DIR / "click_view_report.json"
@@ -206,12 +229,11 @@ class ClickViewReportStream(ReportsStream):
     def post_process(self, row, context):
         row["date"] = row["segments"].pop("date")
 
-        if row.get("clickView", {}).get("keyword") == None:
-            row["clickView"]["keyword"] = 'null'
+        if row.get("clickView", {}).get("keyword") is None:
+            row["clickView"]["keyword"] = "null"
             row["clickView"]["keywordInfo"] = {"matchType": "null"}
 
         return row
-
 
     def get_url_params(self, context, next_page_token):
         """Return a dictionary of values to be used in URL parameterization.
@@ -222,6 +244,7 @@ class ClickViewReportStream(ReportsStream):
 
         Returns:
             A dictionary of URL query parameters.
+
         """
         params: dict = {}
         if next_page_token:
@@ -251,13 +274,16 @@ class ClickViewReportStream(ReportsStream):
                 last_replication_date = yesterdays_date.strftime("%Y-%m-%d")
 
             # This is if the last_replication_date defaults back to the start date (timestamp)
-            if 'T' in last_replication_date:
-                last_replication_date, _ = last_replication_date.split('T')
+            if "T" in last_replication_date:
+                last_replication_date, _ = last_replication_date.split("T")
 
         current_date = datetime.strptime(self.start_date.replace("'", ""), "%Y-%m-%d")
 
         if last_replication_date:
-            current_date = datetime.strptime(last_replication_date.replace("'", ""), "%Y-%m-%d")
+            current_date = datetime.strptime(
+                last_replication_date.replace("'", ""),
+                "%Y-%m-%d",
+            )
 
         # Generate a list of dates up to yesterday
         if current_date < datetime.now() - timedelta(days=1):
@@ -268,7 +294,7 @@ class ClickViewReportStream(ReportsStream):
             date_list.append("'" + yesterdays_date.strftime("%Y-%m-%d") + "'")
 
         for date in date_list:
-            context['date'] = date
+            context["date"] = date
             # Call the parent get_records with the modified context (date value)
             for record in super().get_records(context):
                 yield record
@@ -283,6 +309,7 @@ class ClickViewReportStream(ReportsStream):
 
         Raises:
             Exception: Any exception raised by the sync process.
+
         """
         msg = f"Beginning {self.replication_method.lower()} sync of '{self.name}'"
         if context:
@@ -302,7 +329,7 @@ class ClickViewReportStream(ReportsStream):
                 for _ in self._sync_records(context=context):
                     pass
         except Exception as ex:
-            if hasattr(ex, 'response') and ex.response is not None:
+            if hasattr(ex, "response") and ex.response is not None:
                 status_code = ex.response.status_code
                 if status_code not in [400, 403]:
                     # Raise the exception if it's not 400 or 403
