@@ -143,7 +143,16 @@ class CustomerHierarchyStream(GoogleAdsStream):
 
     def get_child_context(self, record: dict, context: dict | None) -> dict:  # noqa: ARG002
         """Return a context dictionary for child streams."""
-        return {"customer_id": record["customerClient"]["id"]}
+        customer_id = record["customerClient"]["id"]
+
+        # skip if we've already seen this customer
+        if all(
+            any(ctx["customer_id"] == customer_id for ctx in cs.partitions or [])
+            for cs in self.child_streams
+        ):
+            return None
+
+        return {"customer_id": customer_id}
 
 
 class ReportsStream(GoogleAdsStream):
