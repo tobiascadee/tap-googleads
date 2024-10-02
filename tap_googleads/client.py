@@ -112,3 +112,10 @@ class GoogleAdsStream(RESTStream):
         date = datetime.fromisoformat(date) if date else self._end_date
 
         return date.strftime(r"'%Y-%m-%d'")
+
+    @cached_property
+    def customer_ids(self):
+        if self.config.get("customer_ids"):
+            return self.config["customer_ids"]
+
+        return [self.config["customer_id"]] if self.config.get("customer_id") else []

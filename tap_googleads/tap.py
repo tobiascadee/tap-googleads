@@ -93,14 +93,14 @@ class TapGoogleAds(Tap):
             description="Value to use in the login-customer-id header if using a manager customer account. See https://developers.google.com/search-ads/reporting/concepts/login-customer-id for more info.",
         ),
         th.Property(
-            "customer_id",
-            th.StringType,
-            description="Value to use in the login-customer-id header when not using a manager customer account.",
-        ),
-        th.Property(
             "customer_ids",
             th.ArrayType(th.StringType),
-            description="Overrides the taps default get all data for all available customers logic, and will get you the data for only the the provided customer_ids, granted you have access to them.",
+            description="Get data for the provided customers only, rather than all accessible customers. Takes precedence over `customer_id`.",
+        ),
+        th.Property(
+            "customer_id",
+            th.StringType,
+            description="Get data for the provided customer only, rather than all accessible customers. Superseeded by `customer_ids`.",
         ),
         th.Property(
             "start_date",

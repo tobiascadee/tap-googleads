@@ -122,10 +122,7 @@ class CustomerHierarchyStream(GoogleAdsStream):
         """
         customer = row["customerClient"]
 
-        if (
-            self.config.get("customer_ids")
-            and customer["id"] not in self.config["customer_ids"]
-        ):
+        if self.customer_ids and customer["id"] not in self.customer_ids:
             return None
 
         if customer["manager"]:
