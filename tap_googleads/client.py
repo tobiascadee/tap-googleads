@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 from functools import cached_property
 from typing import Any, Dict, Optional
 
-import requests
 from singer_sdk.authenticators import OAuthAuthenticator
 from singer_sdk.streams import RESTStream
+
 from tap_googleads.auth import GoogleAdsAuthenticator, ProxyGoogleAdsAuthenticator
 
 
