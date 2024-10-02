@@ -15,7 +15,7 @@ accessible_customer_return_data = {
 SINGER_MESSAGES = []
 
 
-def accumulate_singer_messages(message):
+def accumulate_singer_messages(_, message):
     """function to collect singer library write_message in tests"""
     SINGER_MESSAGES.append(message)
 
