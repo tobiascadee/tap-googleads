@@ -35,16 +35,16 @@ Settings required to run this tap.
 - `oauth_credentials.client_secret` (required)
 - `oauth_credentials.refresh_token` (required)
 - `developer_token` (required)
+- `customer_ids` (optional) Array of ids: ["123", "456", "789"]
 - `customer_id` (optional)
 - `login_customer_id` (optional)
 - `start_date` (optional)
 - `end_date` (optional)
-- `customer_ids` (optional) Array of ids: ["123", "456", "789"]
 - `enable_click_view_report_stream` (optional) Boolean, Default is `False`
 
-If using a manager account, `login_customer_id` should be set to the customer ID of the manager account. If no you should set `customer_id`.
-
-If you provide `customer_ids`, you filter on which customer accounts you want to get data for.
+If using a manager account, `login_customer_id` should be set to the customer ID of the manager account.
+ 
+If you provide `customer_ids`, you filter on which customer accounts you want to get data for. The same is true for `customer_id` but for a single customer account. If both are provided, `customer_ids` takes precedence. If neither are provided, all customer accounts available to the authenticated principal are synced. 
 
 How to get these settings can be found in the following Google Ads documentation:
 
