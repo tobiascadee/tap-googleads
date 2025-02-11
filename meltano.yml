@@ -13,6 +13,8 @@ plugins:
     - state
     - catalog
     - discover
+    config:
+      login_customer_id: $TAP_GOOGLEADS_LOGIN_CUSTOMER_ID
     settings:
     - name: developer_token
       kind: password

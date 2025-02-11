@@ -2,20 +2,19 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Any, Dict, Iterable, Optional
 from datetime import datetime, timedelta
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Dict, Iterable, Optional, TypeVar
 
-from requests.models import Response as Response
 from singer_sdk import typing as th  # JSON Schema typing helpers
-from singer_sdk.helpers.types import Record, Context
 
 from tap_googleads.client import GoogleAdsStream
 
-# TODO: Delete this is if not using json files for schema definition
+if TYPE_CHECKING:
+    from singer_sdk.helpers.types import Context, Record
+
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
-# TODO: - Override `UsersStream` and `GroupsStream` with your own stream definition.
-#       - Copy-paste as many times as needed to create multiple stream types.
+_TToken = TypeVar("_TToken")
 
 
 class AccessibleCustomers(GoogleAdsStream):
@@ -69,8 +68,7 @@ class CustomerHierarchyStream(GoogleAdsStream):
         # Paramas
         path = "/customers/{customer_id}"
         path = path + "/googleAds:search"
-        path = path + "?pageSize=10000"
-        path = path + f"&query={self.gaql}"
+        path = path + f"?query={self.gaql}"
         return path
 
     @property
@@ -151,8 +149,7 @@ class GeotargetsStream(GoogleAdsStream):
         # Paramas
         path = f"/customers/{self.config.get('login_customer_id')}"
         path = path + "/googleAds:search"
-        path = path + "?pageSize=10000"
-        path = path + f"&query={self.gaql}"
+        path = path + f"?query={self.gaql}"
         return path
 
     gaql = """
@@ -169,19 +166,34 @@ class GeotargetsStream(GoogleAdsStream):
 class ReportsStream(GoogleAdsStream):
     rest_method = "POST"
     parent_stream_type = CustomerHierarchyStream
+    path = "/customers/{customer_id}/googleAds:search"
 
     @property
     def gaql(self):
         raise NotImplementedError
 
-    @property
-    def path(self):
-        # Paramas
-        path = "/customers/{customer_id}"
-        path = path + "/googleAds:search"
-        path = path + "?pageSize=10000"
-        path = path + f"&query={self.gaql}"
-        return path
+    def prepare_request_payload(
+        self,
+        context: Context | None,
+        next_page_token: _TToken | None,
+    ) -> dict | None:
+        """Prepare the data payload for the REST API request.
+
+        By default, no payload will be sent (return None).
+
+        Developers may override this method if the API requires a custom payload along
+        with the request. (This is generally not required for APIs which use the
+        HTTP 'GET' method.)
+
+        Args:
+            context: Stream partition or context dictionary.
+            next_page_token: Token, page number or any request argument to request the
+                next page of data.
+        """
+        return {
+            "query": self.gaql,
+            "pageToken": next_page_token,
+        }
 
 
 class ClickViewReportStream(ReportsStream):
@@ -234,21 +246,6 @@ class ClickViewReportStream(ReportsStream):
             row["clickView"]["keywordInfo"] = {"matchType": "null"}
 
         return row
-
-    def get_url_params(self, context, next_page_token):
-        """Return a dictionary of values to be used in URL parameterization.
-
-        Args:
-            context: The stream context.
-            next_page_token: The next page index or value.
-
-        Returns:
-            A dictionary of URL query parameters.
-        """
-        params: dict = {}
-        if next_page_token:
-            params["page"] = next_page_token
-        return params
 
     def get_records(self, context: Optional[dict]) -> Iterable[Dict[str, Any]]:
         date_list = []

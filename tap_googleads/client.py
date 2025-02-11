@@ -19,7 +19,7 @@ from tap_googleads.auth import GoogleAdsAuthenticator, ProxyGoogleAdsAuthenticat
 class GoogleAdsStream(RESTStream):
     """GoogleAds stream class."""
 
-    url_base = "https://googleads.googleapis.com/v16"
+    url_base = "https://googleads.googleapis.com/v18"
 
     records_jsonpath = "$[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = "$.nextPageToken"  # Or override `get_next_page_token`.
@@ -89,8 +89,6 @@ class GoogleAdsStream(RESTStream):
     ) -> Dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization."""
         params: dict = {}
-        if next_page_token:
-            params["pageToken"] = next_page_token
         if self.replication_key:
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
